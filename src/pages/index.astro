@@ -1,0 +1,29 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main class="prose prose-slate prose-lg max-w-none">
+			<h1>Minimalist Diary</h1>
+			<p>
+				소아과 의사이자 개발자의 기록입니다. 병원 이야기, 개발 아키텍처, 그리고 일상의 잡동사니들을 정갈하게 담아냅니다.
+			</p>
+			<p>
+				이 블로그는 <strong>Astro</strong>와 <strong>Tailwind CSS</strong>를 사용하여 본질에 집중하도록 설계되었습니다.
+			</p>
+			<hr />
+			<h2>최근 기록</h2>
+			<p>글 목록이 여기에 표시됩니다.</p>
+		</main>
+		<Footer />
+	</body>
+</html>
