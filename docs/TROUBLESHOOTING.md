@@ -6,4 +6,4 @@
 - [Vercel 배포 관련 문제](./troubleshooting/vercel.md): Next.js 오인 및 서브모듈 동기화 에러.
 
 ## 개발 환경 및 CMS
-- [Keystatic/Astro 통합](./troubleshooting/keystatic.md): 라우트 충돌 및 의존성 문제 (작성 예정).
+- [커스텀 라이팅 스튜디오](./troubleshooting/write.md): 에디터 기능 및 저장 관련 문제 (작성 예정).

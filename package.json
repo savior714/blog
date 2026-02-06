@@ -10,19 +10,12 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.13",
-    "@astrojs/react": "^4.4.2",
     "@astrojs/rss": "^4.0.15",
     "@astrojs/sitemap": "^3.7.0",
     "@astrojs/vercel": "^9.0.4",
-    "@keystatic/astro": "^5.0.6",
-    "@keystatic/core": "^0.5.48",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.18",
-    "@types/react": "^19.2.13",
-    "@types/react-dom": "^19.2.3",
     "astro": "^5.17.1",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
     "sharp": "^0.34.3",
     "tailwindcss": "^4.1.18"
   }
