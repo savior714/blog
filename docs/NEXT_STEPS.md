@@ -1,8 +1,9 @@
 # NEXT_STEPS.md
 
 ## 우선 수행 과제
-- [ ] **Vercel 배포 완료**: Vercel 대시보드에서 Framework Preset을 `Astro`로 변경하여 빌드 성공 확인.
-- [ ] **서브모듈 권한 설정**: Vercel 배포 시 `skills` 서브모듈 접근 권한 문제 해결 (Git 설정 확인).
+- [x] **Vercel 배포 성공 확인**: `vercel.json` 적용 후 Astro 엔진으로 정상 빌드 및 배포되는지 최종 모니터링.
+- [ ] **로컬 워크플로우 테스트**: `npm run new-post`로 생성한 실제 글이 배포 후 사이트에 정갈하게 노출되는지 확인.
+- [ ] **서브모듈 동기화 디버깅**: Vercel 빌드 중 `skills` 서브모듈 fetch 경고 해결 (필요 시).
 
 ## 기능 고도화
 - [ ] **메인 페이지 글 목록 구현**: `src/pages/index.astro`에서 블로그 포스트 리스트를 동적으로 렌더링.

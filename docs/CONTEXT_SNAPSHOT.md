@@ -8,8 +8,8 @@
 ## 2. 기술 스택 (Tech Stack)
 - **Framework:** Astro 5 (Server Mode)
 - **Styling:** Tailwind CSS 4, @tailwindcss/typography
-- **Writing Studio:** Custom Minimalist Interface (`/write`)
-- **Hosting:** Vercel (@astrojs/vercel adapter)
+- **Writing Studio:** Keystatic CMS (`/keystatic`) & Local CLI Scaffolder (`npm run new-post`)
+- **Hosting:** Vercel (@astrojs/vercel adapter, `vercel.json` fixed)
 - **Skill Integration:** `skills` 서브모듈 통합 완료
 
 ## 3. 핵심 규칙 (Core Rules)
