@@ -1,0 +1,35 @@
+
+> blog@0.0.1 build
+> astro build
+
+[33m[1m04:45:27[22m [WARN] [router][39m The route "/api/keystatic/[...conf]" is defined in both "src/pages/api/keystatic/[...conf].ts" and "node_modules/@keystatic/astro/internal/keystatic-api.js" using SSR mode. A dynamic SSR route cannot be defined more than once.
+[33m[1m04:45:27[22m [WARN] [router][39m A collision will result in an hard error in following versions of Astro.
+[33m[1m04:45:27[22m [WARN] [router][39m The route "/keystatic/[...conf]" is defined in both "src/pages/keystatic/[...conf].astro" and "node_modules/@keystatic/astro/internal/keystatic-astro-page.astro" using SSR mode. A dynamic SSR route cannot be defined more than once.
+[33m[1m04:45:27[22m [WARN] [router][39m A collision will result in an hard error in following versions of Astro.
+[2m04:45:27[22m [34m[content][39m Syncing content
+[2m04:45:27[22m [34m[content][39m Synced content
+[2m04:45:27[22m [34m[types][39m Generated [2m408ms[22m
+[2m04:45:27[22m [34m[build][39m output: [34m"server"[39m
+[2m04:45:27[22m [34m[build][39m mode: [34m"server"[39m
+[2m04:45:27[22m [34m[build][39m directory: [34mC:\develop\blog\dist\[39m
+[2m04:45:27[22m [34m[build][39m adapter: [32m@astrojs/vercel[39m
+[2m04:45:27[22m [34m[build][39m Collecting build info...
+[2m04:45:27[22m [34m[build][39m [32m??Completed in 434ms.[39m
+[2m04:45:27[22m [34m[build][39m Building server entrypoints...
+[33m[1m04:45:28[22m [WARN] [router][39m getStaticPaths() ignored in dynamic page [1m/src/pages/blog/[...slug].astro[22m. Add `export const prerender = true;` to prerender the page as static HTML during the build process.
+04:45:28 [ERROR] [vite] ??[39m Build failed in 576ms
+src/pages/api/keystatic/[...conf].ts (1:9): "makeApiHandler" is not exported by "node_modules/@keystatic/astro/dist/keystatic-astro-api.js", imported by "src/pages/api/keystatic/[...conf].ts".
+file: C:/develop/blog/src/pages/api/keystatic/[...conf].ts:1:9
+
+1: import { makeApiHandler } from '@keystatic/astro/api';
+            ^
+2: import config from '../../../../keystatic.config';
+
+  Location:
+    C:/develop/blog/src/pages/api/keystatic/[...conf].ts:1:9
+  Stack trace:
+    at getRollupError (file:///C:/develop/blog/node_modules/rollup/dist/es/shared/parseAst.js:402:41)
+    at Module.error (file:///C:/develop/blog/node_modules/rollup/dist/es/shared/node-entry.js:17040:16)
+    at ModuleScope.findVariable (file:///C:/develop/blog/node_modules/rollup/dist/es/shared/node-entry.js:15070:39)
+    at CallExpression.bind (file:///C:/develop/blog/node_modules/rollup/dist/es/shared/node-entry.js:2829:23)
+    at VariableDeclarator.bind (file:///C:/develop/blog/node_modules/rollup/dist/es/shared/node-entry.js:2829:23)
