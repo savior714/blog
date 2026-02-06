@@ -4,9 +4,12 @@
 - **증상**: 빌드 시 `Error: No Next.js version detected` 에러 발생.
 - **원인**: Vercel이 Astro 프로젝트를 Next.js로 오인하여 잘못된 빌드 프리셋을 적용함.
 - **해결책**:
-    1. Vercel Project Settings > General 접속.
-    2. **Framework Preset**을 `Astro`로 수동 변경 후 저장.
-    3. 다시 배포(Redeploy) 실행.
+    1. **`vercel.json` 추가**: 프로젝트 루트에 아래 내용을 포함한 `vercel.json`을 생성하여 설정을 강제합니다 (조치 완료).
+       ```json
+       { "framework": "astro" }
+       ```
+    2. **Vercel 설정 확인**: 대시보드 Settings > General에서 Framework Preset이 `Astro`인지 다시 확인합니다.
+    3. **재배포**: `git push` 후 자동으로 시작되는 빌드를 확인합니다.
 
 ## 2. Git Submodule 동기화 실패
 - **증상**: `Warning: Failed to fetch one or more git submodules` 발생 및 런타임 에러.
