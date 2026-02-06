@@ -11,15 +11,17 @@ export const POST: APIRoute = async ({ request }) => {
             return new Response(JSON.stringify({ message: 'Title and Content are required' }), { status: 400 });
         }
 
-        // Simple slugification
+        // Improved slugification (supporting Korean and English)
         const slug = title
             .toLowerCase()
-            .replace(/[^\w\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .trim();
+            .trim()
+            .replace(/ /g, '-')
+            .replace(/[^\w\s-\u1100-\u11FF\u3130-\u318F\uA960-\uA97F\uAC00-\uD7AF\uD7B0-\uD7FF]/g, '');
 
-        const fileName = `${slug}.md`;
+        const fileName = `${slug || 'unnamed-post'}.md`;
         const filePath = path.join(process.cwd(), 'src', 'content', 'blog', fileName);
+
+        console.log('Attempting to save to:', filePath);
 
         const fileContent = `---
 title: "${title.replace(/"/g, '\\"')}"
@@ -35,7 +37,12 @@ ${content}
 
         return new Response(JSON.stringify({ message: 'Post saved successfully', slug }), { status: 200 });
     } catch (error) {
-        console.error('Error saving post:', error);
-        return new Response(JSON.stringify({ message: 'Error saving post' }), { status: 500 });
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error('Error saving post:', errorMessage);
+        return new Response(JSON.stringify({
+            message: 'Error saving post',
+            details: errorMessage,
+            path: process.cwd()
+        }), { status: 500 });
     }
 };

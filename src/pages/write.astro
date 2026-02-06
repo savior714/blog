@@ -147,7 +147,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 						contentInput.value = '';
 						descriptionInput.value = '';
 					} else {
-						throw new Error(result.message);
+						throw new Error(result.details || result.message);
 					}
 				} catch (error) {
 					if (statusMsg) {
