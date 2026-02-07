@@ -9,8 +9,8 @@
 - **Framework:** Astro 5 (Server Mode)
 - **Styling:** Tailwind CSS 4, @tailwindcss/typography
 - **Writing Studio:** Keystatic CMS (`/keystatic`) & Local CLI Scaffolder (`npm run new-post`)
-- **Hosting:** Vercel (@astrojs/vercel adapter, `vercel.json` fixed)
-- **Skill Integration:** `skills` 서브모듈 통합 완료
+- **Hosting:** Vercel (Astro Adapter, fixed via `vercel.json`)
+- **Skill Integration:** `skills` submodule integrated
 
 ## 3. 핵심 규칙 (Core Rules)
 - `docs/AGENTS.md`의 지침을 최우선으로 준수.
