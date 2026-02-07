@@ -1,15 +1,15 @@
 # NEXT_STEPS.md
 
-## 우선 수행 과제
-- [ ] **콘텐츠 마이그레이션**: 로컬에서 작성한 테스트 글들이 실제 배포 환경에서 레이아웃에 맞게 노출되는지 최종 검수.
-- [ ] **메인 페이지 고도화**: 현재 하드코딩된 글 목록을 `getCollection`을 통해 동적으로 연결.
-- [ ] **이미지 최적화**: 포스팅 내 이미지가 `astro:assets`를 통해 Vercel에서도 최적으로 서빙되는지 확인.
+## Priority Tasks
+- [ ] **Content Migration**: Final audit to ensure locally written test posts are correctly displayed in the production layout.
+- [ ] **Main Page Enhancement**: Replace hardcoded post lists with dynamic collections using `getCollection`.
+- [ ] **Image Optimization**: Verify that images in posts are optimally served via `astro:assets` on Vercel.
 
-## 기능 고도화
-- [ ] **메인 페이지 글 목록 구현**: `src/pages/index.astro`에서 블로그 포스트 리스트를 동적으로 렌더링.
-- [ ] **카테고리 필터링**: `daily`, `medical`, `dev`, `misc` 카테고리별 글 모아보기 기능 추가.
-- [ ] **SEO 최적화**: 메타 태그 및 사이트맵 세부 설정.
+## Feature Roadmap
+- [ ] **Post List Implementation**: Dynamically render the blog post list on `src/pages/index.astro`.
+- [ ] **Category Filtering**: Add aggregate views for `daily`, `medical`, `dev`, and `misc` categories.
+- [ ] **SEO Tuning**: Refine meta tags and sitemap configuration.
 
-## 미니멀리즘 강화
-- [ ] **다크 모드 지원**: `overreacted.io` 스타일의 부드러운 다크 모드 전환 기능.
-- [ ] **Typography 튜닝**: 고해상도 텍스트 렌더링 및 여백 미세 조정.
+## Minimalism & Polish
+- [ ] **Dark Mode Support**: Soft dark mode transition in the style of `overreacted.io`.
+- [ ] **Typography Tuning**: Fine-tune high-resolution text rendering and margins.

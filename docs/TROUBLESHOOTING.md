@@ -1,10 +1,10 @@
 # TROUBLESHOOTING.md (Index)
 
-이 문서는 프로젝트 수행 중 발생한 주요 문제와 해결 방법을 관리하는 인덱스입니다. 상세 내용은 각 링크의 문서를 참조하십시오.
+This document is the index for managing key issues and solutions encountered during project execution. Refer to the linked documents for details.
 
-## 인프라 및 배포
-- [Vercel 배포 관련 문제](./troubleshooting/vercel.md): Next.js 오인 및 서브모듈 동기화 에러.
+## Infrastructure & Deployment
+- [Vercel Deployment Issues](./troubleshooting/vercel.md): Next.js misidentification and submodule synchronization errors.
 
-## 개발 환경 및 CMS
-- [500 Internal Server Error](./troubleshooting/500-error.md): SSR 모드에서의 블로그 포스트 렌더링 에러 (조치 완료).
-- [커스텀 라이팅 스튜디오](./troubleshooting/write.md): 에디터 기능 및 저장 관련 문제 (작성 예정).
+## Development Environment & CMS
+- [500 Internal Server Error](./troubleshooting/500-error.md): Blog post rendering errors in SSR mode (Resolved).
+- [Custom Writing Studio](./troubleshooting/write.md): Features and saving issues (Placeholder).
