@@ -1,0 +1,22 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g3" x1="70" y1="48" x2="1100" y2="620" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1A2231"/>
+      <stop offset="1" stop-color="#121827"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="#0D131E"/>
+  <rect x="42" y="42" width="1116" height="591" rx="28" fill="url(#g3)" stroke="#30415E"/>
+  <text x="86" y="106" fill="#AAC1F2" font-size="30" font-family="Pretendard, sans-serif">#3 Local AI</text>
+  <text x="86" y="154" fill="#EAF2FF" font-size="44" font-weight="700" font-family="Pretendard, sans-serif">Mac 기본 세팅 가이드</text>
+  <rect x="84" y="188" width="1032" height="2" fill="#324763"/>
+  <rect x="88" y="236" width="1024" height="142" rx="16" fill="#111A2B" stroke="#385177"/>
+  <text x="122" y="288" fill="#D9E6FF" font-size="28" font-family="Pretendard, sans-serif">Model Split: 실험용 / 실전용</text>
+  <text x="122" y="328" fill="#92AEDA" font-size="21" font-family="Pretendard, sans-serif">품질과 속도 균형을 위한 2계층 운영</text>
+  <rect x="88" y="398" width="500" height="172" rx="16" fill="#111A2B" stroke="#385177"/>
+  <text x="122" y="452" fill="#D9E6FF" font-size="24" font-family="Pretendard, sans-serif">Memory / Context 기본값</text>
+  <text x="122" y="488" fill="#92AEDA" font-size="20" font-family="Pretendard, sans-serif">워크로드 기준으로만 확장</text>
+  <rect x="612" y="398" width="500" height="172" rx="16" fill="#111A2B" stroke="#385177"/>
+  <text x="646" y="452" fill="#D9E6FF" font-size="24" font-family="Pretendard, sans-serif">Prompt Template Library</text>
+  <text x="646" y="488" fill="#92AEDA" font-size="20" font-family="Pretendard, sans-serif">실패 프롬프트 별도 축적</text>
+</svg>

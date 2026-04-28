@@ -1,0 +1,25 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g2" x1="64" y1="60" x2="1140" y2="620" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#23262D"/>
+      <stop offset="1" stop-color="#14171D"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="#101216"/>
+  <rect x="44" y="44" width="1112" height="587" rx="28" fill="url(#g2)" stroke="#393D47"/>
+  <text x="88" y="108" fill="#A8AFBF" font-size="30" font-family="Pretendard, sans-serif">#2 Vibe Coding</text>
+  <text x="88" y="156" fill="#F1F3F8" font-size="44" font-weight="700" font-family="Pretendard, sans-serif">MVP 48시간 스프린트</text>
+  <rect x="84" y="188" width="1032" height="2" fill="#333844"/>
+  <rect x="88" y="236" width="504" height="324" rx="16" fill="#12151B" stroke="#343945"/>
+  <text x="120" y="282" fill="#D0D6E4" font-size="24" font-family="Pretendard, sans-serif">초기 6시간: 사용자 흐름 고정</text>
+  <rect x="120" y="308" width="426" height="14" rx="6" fill="#737D92"/>
+  <rect x="120" y="334" width="368" height="14" rx="6" fill="#737D92"/>
+  <rect x="120" y="378" width="178" height="40" rx="10" fill="#6885FF"/>
+  <text x="137" y="404" fill="#FFFFFF" font-size="18" font-family="Pretendard, sans-serif">Demo Scope</text>
+  <rect x="620" y="236" width="492" height="152" rx="16" fill="#12151B" stroke="#343945"/>
+  <text x="652" y="292" fill="#DDE3F1" font-size="24" font-family="Pretendard, sans-serif">AI 에이전트 역할 분리</text>
+  <text x="652" y="326" fill="#8F98AE" font-size="20" font-family="Pretendard, sans-serif">구현 / 리팩터링 / 테스트</text>
+  <rect x="620" y="408" width="492" height="152" rx="16" fill="#12151B" stroke="#343945"/>
+  <text x="652" y="464" fill="#DDE3F1" font-size="24" font-family="Pretendard, sans-serif">성공 조건 3개만 유지</text>
+  <text x="652" y="498" fill="#8F98AE" font-size="20" font-family="Pretendard, sans-serif">나머지는 백로그로 분리</text>
+</svg>

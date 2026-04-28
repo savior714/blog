@@ -1,65 +1,67 @@
-import Image from "next/image";
+import Link from "next/link";
+import { casePosts } from "@/lib/cases";
+import { CaseThumbnail } from "@/components/case-thumbnail";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+    <main className="page">
+      <header className="hero">
+        <p className="eyebrow">SAVIOR LAB NOTES</p>
+        <h1>Build with AI, Ship with Clarity.</h1>
+        <p className="lead">
+          바이브코딩과 로컬 AI 실험을 케이스 단위로 기록합니다. 유튜브에서 다루지
+          못한 구현 맥락과 설정값을 이곳에 정리합니다.
+        </p>
+        <div className="hero-actions">
+          <Link className="button primary" href="#featured">
+            대표 사례 보기
+          </Link>
           <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            className="button ghost"
+            href="https://github.com/savior714/blog"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noreferrer"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
+            GitHub
           </a>
         </div>
-      </main>
-    </div>
+      </header>
+
+      <section className="topics" aria-label="주요 주제">
+        <p>핵심 주제</p>
+        <ul>
+          <li>Vibe Coding</li>
+          <li>Local AI Workflow</li>
+          <li>Local LLM Ops</li>
+          <li>YouTube Deep Dive Notes</li>
+        </ul>
+      </section>
+
+      <section id="featured" className="featured">
+        <div className="section-head">
+          <h2>Featured Case Studies</h2>
+          <Link href="/case">전체 글 보기</Link>
+        </div>
+        <div className="cards">
+          {casePosts.map((post, index) => (
+            <article key={post.title} className="card">
+              <CaseThumbnail post={post} variant="card" />
+              <span>{post.tag}</span>
+              <h3>{`#${index + 1} ${post.title}`}</h3>
+              <p>{post.summary}</p>
+              <Link href={`/case/${post.slug}`}>케이스 읽기 →</Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="cta">
+        <h2>영상 보고 왔다면, 여기서 바로 이어서 보세요</h2>
+        <p>
+          각 글 상단에 유튜브 원본 영상과 함께 실습 코드/설정값을 함께 정리할
+          예정입니다.
+        </p>
+      </section>
+    </main>
   );
 }

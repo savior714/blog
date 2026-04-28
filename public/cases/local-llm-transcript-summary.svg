@@ -1,0 +1,25 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="80" y1="40" x2="1100" y2="640" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#13203C"/>
+      <stop offset="1" stop-color="#0C1222"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="#0B0F1C"/>
+  <rect x="40" y="40" width="1120" height="595" rx="28" fill="url(#g1)" stroke="#2E3F68"/>
+  <text x="86" y="108" fill="#AFC4FF" font-size="30" font-family="Pretendard, sans-serif">#1 Local LLM</text>
+  <text x="86" y="156" fill="#ECF2FF" font-size="46" font-weight="700" font-family="Pretendard, sans-serif">영상 대본 요약 자동화</text>
+  <rect x="84" y="188" width="1032" height="2" fill="#2B3B62"/>
+  <rect x="88" y="236" width="448" height="318" rx="18" fill="#0E172C" stroke="#334A7D"/>
+  <rect x="120" y="270" width="384" height="20" rx="6" fill="#DDE7FF"/>
+  <rect x="120" y="304" width="332" height="14" rx="6" fill="#96ACDF"/>
+  <rect x="120" y="328" width="294" height="14" rx="6" fill="#96ACDF"/>
+  <rect x="120" y="368" width="164" height="40" rx="10" fill="#6D92FF"/>
+  <text x="136" y="394" fill="#FFFFFF" font-size="18" font-family="Pretendard, sans-serif">TL;DR</text>
+  <rect x="560" y="236" width="552" height="94" rx="16" fill="#101C35" stroke="#354C81"/>
+  <text x="590" y="288" fill="#CFE0FF" font-size="28" font-family="Pretendard, sans-serif">Whisper  →  Summary Pipeline</text>
+  <rect x="560" y="350" width="552" height="204" rx="16" fill="#101C35" stroke="#354C81"/>
+  <text x="592" y="396" fill="#DDE7FF" font-size="24" font-family="Pretendard, sans-serif">핵심 포인트 / 체크리스트</text>
+  <text x="592" y="434" fill="#8FA7DF" font-size="20" font-family="Pretendard, sans-serif">업로드 후 10분 내 블로그 초안</text>
+  <text x="592" y="472" fill="#8FA7DF" font-size="20" font-family="Pretendard, sans-serif">템플릿 기반 요약 길이 규칙 적용</text>
+</svg>
