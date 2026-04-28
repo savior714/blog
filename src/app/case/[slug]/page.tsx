@@ -8,6 +8,7 @@ import {
   hasYoutubeVideo,
 } from "@/lib/cases";
 import { CaseThumbnail } from "@/components/case-thumbnail";
+import { ArrowRightIcon, HomeIcon, PlayIcon } from "@/components/ui/icons";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -42,25 +43,29 @@ export default async function CaseDetailPage({ params }: PageProps) {
   }
 
   return (
-    <main className="page">
+    <main className="page magazine-page">
       <nav className="top-nav">
-        <Link href="/" scroll>
+        <Link href="/" scroll className="inline-link">
+          <HomeIcon className="inline-link-icon" />
           홈으로
         </Link>
-        <Link href="/case" scroll>
+        <Link href="/case" scroll className="inline-link">
           사례 목록
         </Link>
       </nav>
-      <article className="case-article">
-        <p className="eyebrow">{post.tag}</p>
-        <h1>{`${caseNumber ? `#${caseNumber} ` : ""}${post.title}`}</h1>
-        <p className="lead">{post.summary}</p>
-        <CaseThumbnail post={post} variant="detail" />
+      <article className="case-article editorial-article">
+        <header className="article-hero">
+          <p className="eyebrow">{post.tag}</p>
+          <h1>{`${caseNumber ? `#${caseNumber} ` : ""}${post.title}`}</h1>
+          <p className="lead">{post.summary}</p>
+          <CaseThumbnail post={post} variant="detail" />
+        </header>
 
         <div className="meta-row">
           <span>{post.publishedAt}</span>
           {hasYoutubeVideo(post) && post.youtubeUrl ? (
-            <a href={post.youtubeUrl} target="_blank" rel="noreferrer">
+            <a href={post.youtubeUrl} target="_blank" rel="noreferrer" className="inline-link">
+              <PlayIcon className="inline-link-icon" />
               연결 영상 보기
             </a>
           ) : (
@@ -68,14 +73,17 @@ export default async function CaseDetailPage({ params }: PageProps) {
           )}
         </div>
 
-        <section className="content-block">
+        <section className="content-block editorial-content">
           {post.content.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
         </section>
 
         <div className="back-link">
-          <Link href="/case">← 전체 사례로 돌아가기</Link>
+          <Link href="/case" className="inline-link">
+            <ArrowRightIcon className="inline-link-icon back" />
+            전체 사례로 돌아가기
+          </Link>
         </div>
       </article>
     </main>

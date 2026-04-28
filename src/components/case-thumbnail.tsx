@@ -29,6 +29,14 @@ export function CaseThumbnail({ post, variant }: CaseThumbnailProps) {
 
   return (
     <div className={`${wrapClass} generated-thumb`}>
+      <svg
+        className="generated-thumb-orb"
+        viewBox="0 0 220 220"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <circle cx="110" cy="110" r="84" />
+      </svg>
       <p className="generated-thumb-tag">{post.tag}</p>
       <p className="generated-thumb-title">{post.title}</p>
       <div className="generated-thumb-keywords">
