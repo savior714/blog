@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Savior Lab Notes
 
-## Getting Started
+Case-based blog for Vibe Coding, Local AI, and Local LLM workflows.
 
-First, run the development server:
+## Local Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Content Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Data source: `src/lib/cases.ts`
+- List page: `/case`
+- Detail page: `/case/[slug]`
+- Thumbnails: `public/cases/*.svg`
 
-## Learn More
+## No-Video Writing Flow
 
-To learn more about Next.js, take a look at the following resources:
+Use this when a post is ready before YouTube is uploaded.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Add a new post object to `casePosts` in `src/lib/cases.ts`.
+2. Keep post ordering stable (`#1`, `#2`, `#3` is based on array order).
+3. Leave `youtubeUrl` empty (or omit it entirely).
+4. Add `thumbnail` with a content-based SVG path (for example, `/cases/my-post.svg`).
+5. Create the SVG in `public/cases/` with title/keywords from the article.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Behavior:
 
-## Deploy on Vercel
+- If `thumbnail` exists, it is shown on home/list/detail.
+- If `youtubeUrl` is missing, detail page shows `영상 링크 준비 중`.
+- If `thumbnail` is also missing, fallback generated thumbnail UI is used.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Pre-Deploy Check
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lint
+npm run build
+```
