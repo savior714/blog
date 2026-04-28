@@ -28,13 +28,13 @@
 }
 
 :root {
-  --background: #090c12;
-  --foreground: #f7f8fb;
-  --muted: #99a5bd;
-  --card: #0f141f;
-  --line: #27344a;
-  --accent: #6ff7d8;
-  --accent-warm: #f6b06d;
+  --background: #f7f9ff;
+  --foreground: #21304d;
+  --muted: #627395;
+  --card: #ffffff;
+  --line: #dbe4f6;
+  --accent: #4a72e8;
+  --accent-warm: #f2b7c8;
 }
 
 @theme inline {
@@ -50,12 +50,14 @@ body {
   letter-spacing: -0.012em;
   font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   background-image:
-    linear-gradient(to right, color-mix(in srgb, var(--line) 35%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--line) 28%, transparent) 1px, transparent 1px),
-    radial-gradient(circle at 15% -8%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 40%);
+    linear-gradient(to right, color-mix(in srgb, var(--line) 52%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--line) 42%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at 16% -8%, color-mix(in srgb, #c3d4ff 45%, transparent), transparent 42%),
+    radial-gradient(circle at 86% 6%, color-mix(in srgb, #ffd9e6 34%, transparent), transparent 36%);
   background-size:
     44px 44px,
     44px 44px,
+    auto,
     auto;
 }
 
@@ -107,7 +109,7 @@ body {
 .hero-panel,
 .hero-aside {
   border: 1px solid color-mix(in srgb, var(--line) 84%, transparent);
-  background: color-mix(in srgb, var(--card) 92%, transparent);
+  background: color-mix(in srgb, var(--card) 98%, transparent);
   border-radius: 18px;
 }
 
@@ -164,11 +166,11 @@ body {
 .button.primary {
   background: var(--accent);
   border-color: color-mix(in srgb, var(--accent) 80%, #ffffff);
-  color: #071a1d;
+  color: #ffffff;
 }
 
 .button.ghost {
-  background: color-mix(in srgb, var(--card) 95%, transparent);
+  background: color-mix(in srgb, #edf2ff 45%, var(--card));
 }
 
 .button:hover {
@@ -188,7 +190,7 @@ body {
   padding: 24px;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: color-mix(in srgb, var(--card) 90%, transparent);
+  background: color-mix(in srgb, #f4f7ff 35%, var(--card));
 }
 
 .topics-editorial {
@@ -213,10 +215,10 @@ body {
 .topics li {
   border: 1px solid color-mix(in srgb, var(--line) 90%, transparent);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--background) 30%, var(--card));
+  background: color-mix(in srgb, #eef3ff 40%, var(--card));
   padding: 7px 12px;
   font-size: 13px;
-  color: color-mix(in srgb, var(--foreground) 84%, transparent);
+  color: color-mix(in srgb, var(--foreground) 76%, transparent);
 }
 
 .featured {
@@ -249,17 +251,17 @@ body {
 }
 
 .card {
-  background: color-mix(in srgb, var(--card) 95%, transparent);
+  background: color-mix(in srgb, #f9fbff 20%, var(--card));
   border: 1px solid color-mix(in srgb, var(--line) 90%, transparent);
   border-radius: 14px;
   padding: 17px 17px 18px;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--line) 20%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--line) 32%, transparent);
 }
 
 .card span {
   display: inline-block;
   font-size: 11px;
-  color: color-mix(in srgb, var(--accent-warm) 65%, white);
+  color: color-mix(in srgb, var(--accent) 75%, var(--muted));
   margin-bottom: 9px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -314,8 +316,8 @@ body {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(circle at 20% 10%, color-mix(in srgb, var(--accent) 34%, transparent), transparent 42%),
-    linear-gradient(155deg, color-mix(in srgb, var(--background) 65%, var(--card)), var(--card));
+    radial-gradient(circle at 20% 10%, color-mix(in srgb, #c6d8ff 70%, transparent), transparent 44%),
+    linear-gradient(155deg, color-mix(in srgb, #eef3ff 58%, var(--card)), var(--card));
 }
 
 .generated-thumb-orb {
@@ -324,8 +326,8 @@ body {
   height: 132px;
   right: -28px;
   top: -36px;
-  opacity: 0.3;
-  color: color-mix(in srgb, var(--accent) 65%, var(--line));
+  opacity: 0.2;
+  color: color-mix(in srgb, var(--accent) 42%, var(--line));
 }
 
 .generated-thumb-orb circle {
@@ -337,7 +339,7 @@ body {
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--accent-warm) 70%, white);
+  color: color-mix(in srgb, var(--accent) 68%, var(--muted));
   font-weight: 700;
 }
 
@@ -364,7 +366,7 @@ body {
   font-size: 11px;
   color: color-mix(in srgb, var(--foreground) 88%, transparent);
   border: 1px solid color-mix(in srgb, var(--line) 96%, transparent);
-  background: color-mix(in srgb, var(--background) 30%, var(--card));
+  background: color-mix(in srgb, #edf2ff 34%, var(--card));
   border-radius: 999px;
   padding: 3px 8px;
   position: relative;
@@ -376,7 +378,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 24px;
-  background: color-mix(in srgb, var(--card) 90%, transparent);
+  background: color-mix(in srgb, #f4f8ff 32%, var(--card));
 }
 
 .cta h2 {
@@ -463,7 +465,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 24px;
-  background: color-mix(in srgb, var(--card) 92%, transparent);
+  background: color-mix(in srgb, #f4f8ff 30%, var(--card));
 }
 
 .archive-meta {
@@ -485,7 +487,7 @@ body {
 .editorial-article {
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: color-mix(in srgb, var(--card) 92%, transparent);
+  background: color-mix(in srgb, #f4f8ff 26%, var(--card));
   padding: 24px;
 }
 
@@ -510,7 +512,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 28px;
-  background: color-mix(in srgb, var(--card) 93%, transparent);
+  background: color-mix(in srgb, #f4f8ff 30%, var(--card));
 }
 
 .hero-aside-number {
@@ -533,12 +535,12 @@ body {
   position: absolute;
   right: -28px;
   bottom: -66px;
-  opacity: 0.4;
+  opacity: 0.24;
 }
 
 .hero-orbit circle {
   fill: none;
-  stroke: color-mix(in srgb, var(--accent) 58%, transparent);
+  stroke: color-mix(in srgb, var(--accent) 36%, transparent);
   stroke-width: 2;
 }
 
