@@ -1,0 +1,197 @@
+---
+import Layout from '../../components/Layout.astro';
+---
+
+<Layout title="Cases | Savior Lab Notes">
+  <div class="admin-page">
+    <nav class="admin-nav">
+      <a href="/" class="admin-nav-brand">Savior Lab Notes</a>
+      <div class="admin-nav-links">
+        <a href="/case" class="active">Cases</a>
+        <a href="/editor">Editor</a>
+      </div>
+    </nav>
+
+    <main class="cases-page">
+      <header class="cases-header">
+        <h1>Case Studies</h1>
+        <p class="cases-lead">바이브코딩과 로컬 AI 실험을 케이스 단위로 기록합니다.</p>
+      </header>
+
+      <div id="cases-list" class="cases-grid">
+        <p class="loading">로딩 중...</p>
+      </div>
+    </main>
+  </div>
+</Layout>
+
+<script is:inline>
+  const list = document.getElementById('cases-list');
+
+  fetch('/api/cases.json')
+    .then((r) => r.json())
+    .then((cases) => {
+      if (!cases.length) {
+        list.innerHTML = '<p class="empty">등록된 사례가 없습니다.</p>';
+        return;
+      }
+      list.innerHTML = cases.map((c) => `
+        <a href="/case/${c.slug}" class="case-card">
+          <span class="case-tag">${escapeHtml(c.tag)}</span>
+          <h3>${escapeHtml(c.title)}</h3>
+          <p>${escapeHtml(c.summary)}</p>
+          <span class="case-date">${c.publishedAt}</span>
+        </a>
+      `).join('');
+    })
+    .catch(() => {
+      list.innerHTML = '<p class="error">사례를 불러오지 못했습니다.</p>';
+    });
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+</script>
+
+<style>
+  .admin-page {
+    max-width: 1080px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 72px 48px 104px;
+  }
+
+  .admin-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 32px;
+  }
+
+  .admin-nav-brand {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--foreground);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+  }
+
+  .admin-nav-links {
+    display: flex;
+    gap: 16px;
+  }
+
+  .admin-nav-links a {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 120ms ease;
+  }
+
+  .admin-nav-links a:hover {
+    color: var(--foreground);
+    background: color-mix(in srgb, var(--card) 60%, var(--background));
+  }
+
+  .admin-nav-links a.active {
+    color: var(--accent);
+    background: color-mix(in srgb, #edf2ff 50%, var(--card));
+  }
+
+  .cases-header {
+    margin-bottom: 32px;
+  }
+
+  .cases-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+  }
+
+  .cases-lead {
+    color: var(--muted);
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  .cases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+
+  .case-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px 24px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--card);
+    text-decoration: none;
+    color: inherit;
+    transition: all 120ms ease;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--line) 32%, transparent);
+  }
+
+  .case-card:hover {
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+    transform: translateY(-1px);
+  }
+
+  .case-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .case-card h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+  }
+
+  .case-card p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .case-date {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .loading,
+  .empty,
+  .error {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+
+  .error {
+    color: #e53e3e;
+  }
+
+  @media (max-width: 720px) {
+    .admin-page {
+      padding: 0 18px 84px;
+    }
+  }
+</style>
