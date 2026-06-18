@@ -8,24 +8,33 @@ Case-based blog for Vibe Coding, Local AI, and Local LLM workflows.
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:4321](http://localhost:4321).
 
 ## Content Structure
 
-- Data source: `src/lib/cases.ts`
+- Content collection: `src/content/cases/` (Markdown files with frontmatter)
+- Collection schema: `src/content/config.ts`
+- Types & utilities: `src/lib/cases.ts`
 - List page: `/case`
 - Detail page: `/case/[slug]`
 - Thumbnails: `public/cases/*.svg`
 
-## No-Video Writing Flow
+## Writing a Post
 
-Use this when a post is ready before YouTube is uploaded.
+Create a new Markdown file in `src/content/cases/` with frontmatter:
 
-1. Add a new post object to `casePosts` in `src/lib/cases.ts`.
-2. Keep post ordering stable (`#1`, `#2`, `#3` is based on array order).
-3. Leave `youtubeUrl` empty (or omit it entirely).
-4. Add `thumbnail` with a content-based SVG path (for example, `/cases/my-post.svg`).
-5. Create the SVG in `public/cases/` with title/keywords from the article.
+```yaml
+---
+tag: "Vibe Coding"
+title: "Post Title"
+summary: "Short summary for cards"
+thumbnail: "/cases/post-slug.svg"
+youtubeUrl: "https://youtube.com/..."
+publishedAt: "2026-04-28"
+---
+
+Post content here...
+```
 
 Behavior:
 
