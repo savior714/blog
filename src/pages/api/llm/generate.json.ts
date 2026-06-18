@@ -42,19 +42,33 @@ TITLE: ${title}
 CONTENT: ${content}
 
 Generate:
-1. A concise summary (1-2 sentences, max 200 characters) in the same language as the input
+1. A concise summary (1 sentence, max 50 characters) in the same language as the input
 2. An SVG thumbnail (400x225 pixels) with:
-   - Title words (first 3-5 words from the actual title) as large text
-   - A short summary (1 sentence) below the title
+   - Title words from the actual title (use first 3-4 words, max 16 characters total)
+   - A short summary (1 sentence, max 50 chars) below the title
    - Modern color palette (blues, purples, or teals)
    - Simple geometric shapes
 
-IMPORTANT: Replace "First Three Words" with actual title words and "Short summary preview" with actual summary text.
+TEXT OVERFLOW RULES (MUST FOLLOW):
+- DO NOT use textLength attribute (it distorts character spacing)
+- DO NOT use lengthAdjust attribute
+- If title exceeds 16 characters, split into 2 lines using two <text> elements (y positions ~26px apart)
+- Title font-size: 20px, Summary font-size: 12px
+- Keep text readable
+
+EXAMPLE (correct):
+<text x="200" y="90" text-anchor="middle" fill="white" font-size="20" font-family="Arial, sans-serif" font-weight="bold">Intro To SVG</text>
+
+EXAMPLE (correct - long title split):
+<text x="200" y="85" text-anchor="middle" fill="white" font-size="20" font-family="Arial, sans-serif" font-weight="bold">This is an</text>
+<text x="200" y="111" text-anchor="middle" fill="white" font-size="20" font-family="Arial, sans-serif" font-weight="bold">extremely long</text>
+
+IMPORTANT: Do NOT use textLength or lengthAdjust attributes.
 
 Respond in JSON format only:
 {
   "summary": "actual summary text here",
-  "svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 225'>...actual SVG with real text...</svg>"
+  "svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 225'>...actual SVG with real text, ALL text elements MUST have textLength and lengthAdjust attributes...</svg>"
 }`;
 
     let parsed;
@@ -130,7 +144,39 @@ Respond in JSON format only:
         summary = top.map(s => s.text).join(' ').trim();
       }
 
-      const titleWords = (title || 'Post').split(/\s+/).slice(0, 3).join(' ');
+      const allTitleWords = (title || 'Post').split(/\s+/);
+      const safeSummary = (summary || '').slice(0, 50).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;');
+      
+      // Build title up to max 16 characters for readability
+      const maxTitleChars = 16;
+      let displayTitle = '';
+      for (const word of allTitleWords) {
+        const candidate = displayTitle ? displayTitle + ' ' + word : word;
+        if (candidate.length <= maxTitleChars) {
+          displayTitle = candidate;
+        } else {
+          break;
+        }
+      }
+      displayTitle = displayTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;');
+      
+      // Determine if title needs 2 lines (more than ~14 chars)
+      const titleNeedTwoLines = displayTitle.length > 14;
+      
+      let titleText1 = '';
+      let titleText2 = '';
+      if (titleNeedTwoLines) {
+        // Split into two lines at word boundary
+        const midPoint = Math.ceil(displayTitle.length / 2);
+        const lastSpace = displayTitle.lastIndexOf(' ', midPoint);
+        if (lastSpace > 4) {
+          titleText1 = displayTitle.slice(0, lastSpace);
+          titleText2 = displayTitle.slice(lastSpace + 1);
+        } else {
+          titleText1 = displayTitle.slice(0, midPoint).trim();
+          titleText2 = displayTitle.slice(midPoint).trim();
+        }
+      }
       
       parsed = {
         summary: summary || (title || 'Untitled').slice(0, 200),
@@ -144,9 +190,10 @@ Respond in JSON format only:
           <rect width="400" height="225" fill="url(#bg)"/>
           <circle cx="320" cy="50" r="80" fill="rgba(255,255,255,0.1)"/>
           <circle cx="80" cy="180" r="60" fill="rgba(255,255,255,0.1)"/>
-          <text x="200" y="95" text-anchor="middle" fill="white" font-size="24" font-family="Arial, sans-serif" font-weight="bold">${titleWords}</text>
-          <line x1="150" y1="115" x2="250" y2="115" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
-          <text x="200" y="145" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="13" font-family="Arial, sans-serif">${summary.slice(0, 50)}</text>
+          ${titleNeedTwoLines ? `<text x="200" y="85" text-anchor="middle" fill="white" font-size="20" font-family="Arial, sans-serif" font-weight="bold">${titleText1}</text>
+          <text x="200" y="111" text-anchor="middle" fill="white" font-size="20" font-family="Arial, sans-serif" font-weight="bold">${titleText2}</text>` : `<text x="200" y="95" text-anchor="middle" fill="white" font-size="20" font-family="Arial, sans-serif" font-weight="bold">${displayTitle}</text>`}
+          <line x1="150" y1="${titleNeedTwoLines ? 131 : 115}" x2="250" y2="${titleNeedTwoLines ? 131 : 115}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+          <text x="200" y="${titleNeedTwoLines ? 161 : 145}" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="12" font-family="Arial, sans-serif">${safeSummary}</text>
         </svg>`
       };
     }
