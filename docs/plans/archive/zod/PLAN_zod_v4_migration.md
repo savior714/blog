@@ -73,7 +73,7 @@
 just route src/content/config.ts src/pages/api/cases/write.json.ts src/pages/case/[slug].astro --json
 ```
 
-플랜 갱신 시 본 절 재생성: `just plan-preread docs/plans/PLAN_zod_v4_migration.md --write` → `just plan-lint docs/plans/PLAN_zod_v4_migration.md`
+플랜 갱신 시 본 절 재생성: `just plan-preread docs/plans/archive/docs/plans --write` → `just plan-lint docs/plans/archive/docs/plans`
 
 ## 실행 순서·선행
 
@@ -137,7 +137,7 @@ schema: z.object({
 | 허용 | 금지 |
 | :--- | :--- |
 | `just plan-task-close` CLI를 사용한 Task `Status`·`Conclusion` 자동 갱신 | 텍스트 에디터(replace 등)로 본 파일 Task 상태 In-place 직접 수정 |
-| Task `Verify` 직후 `just plan-lint docs/plans/PLAN_zod_v4_migration.md` | Conclusion 없이 `Status: done` 처리 |
+| Task `Verify` 직후 `just plan-lint docs/plans/archive/docs/plans` | Conclusion 없이 `Status: done` 처리 |
 | **Closeout Task**에서 Roll-up 줄 편집 | Closeout Task **외** Blueprint Task `Status`/`Conclusion` 직접 수정 |
 | Task Goal에 명시된 Target·명세 동반 수정 | ROADMAP·다른 Blueprint 대량 수정 |
 | (동결 중) `just plan-task-close`·Closeout Roll-up | Task 추가·삭제·Goal/Target/Dependency/Trace **구조 변경** · 실행 중 AskQuestion 범위 재협상 |
@@ -148,7 +148,7 @@ schema: z.object({
 
 ## 🛠️ Step-by-Step Execution Plan
 
-> **에이전트 스코프**: 사용자가 Blueprint **전체 실행**을 요청하면 Task를 **Dependency 순**으로 1개씩만 진행한다. Blueprint Task 구조는 **동결** — `plan-task-close`·Closeout Roll-up만 예외. `Verify` PASS → `just plan-task-close plan=... task=... conclusion="..."` (Conclusion 갱신) → `just plan-lint docs/plans/PLAN_zod_v4_migration.md` → 다음 Task. **마지막 Closeout Task**에서 Roll-up 후 `just plan-close` Verify.
+> **에이전트 스코프**: 사용자가 Blueprint **전체 실행**을 요청하면 Task를 **Dependency 순**으로 1개씩만 진행한다. Blueprint Task 구조는 **동결** — `plan-task-close`·Closeout Roll-up만 예외. `Verify` PASS → `just plan-task-close plan=... task=... conclusion="..."` (Conclusion 갱신) → `just plan-lint docs/plans/archive/docs/plans` → 다음 Task. **마지막 Closeout Task**에서 Roll-up 후 `just plan-close` Verify.
 
 ### Phase 0 — Edge case gap audit
 
@@ -157,11 +157,11 @@ schema: z.object({
 - **Pre-read**: 이 Task만 — `write`/`patch` 전 **전부** Read <!-- plan-task-preread:v1 paths=2 must_read_installed=0 -->
   1. `[rule]` `.agents/workflows/plan.md`
   2. `[rule]` `.agents/core/code_quality_lifecycle.md`
-- **Action**: Edit File | **Target**: `docs/plans/PLAN_zod_v4_migration.md`
-- **Closeout**: `docs/plans/PLAN_zod_v4_migration.md` (Task TEM-401 `Conclusion`·`Status`)
+- **Action**: Edit File | **Target**: `docs/plans/archive/docs/plans`
+- **Closeout**: `docs/plans/archive/docs/plans` (Task TEM-401 `Conclusion`·`Status`)
 - **Goal**: Origin Intent와 Risk를 근거로 Edge Case Trace 표를 채우고, 인범위·미매핑 엣지마다 Atomic Task를 추가하거나 범위 밖 사유를 업무 요약에 기록한다.
 - **Diagnostics**: 0
-- **Verify**: `just plan-lint docs/plans/PLAN_zod_v4_migration.md`
+- **Verify**: `just plan-lint docs/plans/archive/docs/plans`
 - **Conclusion**: Edge Case Trace 감사 완료: publishedAt 날짜 형식 불일치 Risk는 z.coerce.date()로 우회 해결 확인, thumbnail 상대 경로 Risk는 z.string().url().or(z.string().startsWith('/'))로 해결 확인, write.json.ts API Route 영향도 낮음(스키마 검증 없이 파일 직접 작성) 확인. plan-lint 통과. [closed-by:plan-task-close]
 - **Dependency**: None
 
@@ -172,7 +172,7 @@ schema: z.object({
 - **Pre-read**: 이 Task만 — `write`/`patch` 전 **전부** Read <!-- plan-task-preread:v1 paths=1 must_read_installed=0 -->
   1. _(없음 — `Target`에 경로를 넣은 뒤 `just plan-preread <plan> --write` 재실행)_
 - **Action**: Edit File | **Target**: `src/content/config.ts`
-- **Closeout**: `docs/plans/PLAN_zod_v4_migration.md` (Task TEM-402 `Conclusion`·`Status`)
+- **Closeout**: `docs/plans/archive/docs/plans` (Task TEM-402 `Conclusion`·`Status`)
 - **Goal**: `src/content/config.ts`에서 `thumbnail`을 `z.string().url().optional()`, `youtubeUrl`을 `z.url().optional()`, `publishedAt`를 `z.coerce.date()`로 변경한다.
 - **Diagnostics**: 0
 - **Verify**: `npm run build`
@@ -184,7 +184,7 @@ schema: z.object({
 - **Pre-read**: 이 Task만 — `write`/`patch` 전 **전부** Read <!-- plan-task-preread:v1 paths=1 must_read_installed=0 -->
   1. _(없음 — `Target`에 경로를 넣은 뒤 `just plan-preread <plan> --write` 재실행)_
 - **Action**: Edit File | **Target**: `src/pages/case/[slug].astro`
-- **Closeout**: `docs/plans/PLAN_zod_v4_migration.md` (Task TEM-403 `Conclusion`·`Status`)
+- **Closeout**: `docs/plans/archive/docs/plans` (Task TEM-403 `Conclusion`·`Status`)
 - **Goal**: `publishedAt`가 `Date` 객체로 변경되므로 `[slug].astro`의 `{publishedAt}` 템플릿 렌더링이 `Date.toLocaleDateString()` 등으로 호환되도록 수정한다.
 - **Diagnostics**: 0
 - **Verify**: `npm run build`
@@ -198,7 +198,7 @@ schema: z.object({
 - **Pre-read**: 이 Task만 — `write`/`patch` 전 **전부** Read <!-- plan-task-preread:v1 paths=1 must_read_installed=0 -->
   1. _(없음 — `Target`에 경로를 넣은 뒤 `just plan-preread <plan> --write` 재실행)_
 - **Action**: Edit File | **Target**: `src/content/config.ts`
-- **Closeout**: `docs/plans/PLAN_zod_v4_migration.md` (Task TEM-404 `Conclusion`·`Status`)
+- **Closeout**: `docs/plans/archive/docs/plans` (Task TEM-404 `Conclusion`·`Status`)
 - **Goal**: `astro build`를 실행하여 스키마 변경이 빌드 파이프라인에 영향을 주지 않음을 검증한다.
 - **Diagnostics**: 0
 - **Verify**: `npm run build`
@@ -211,13 +211,13 @@ schema: z.object({
 - Task-ID: [TEM-499] | Linear-Issue: TEM-401 | Status: done | Priority: 3 | Labels: docs | RetryPolicy: none
 - **Pre-read**: 이 Task만 — `write`/`patch` 전 **전부** Read <!-- plan-task-preread:v1 paths=2 must_read_installed=0 -->
   1. `[rule]` `.agents/workflows/plan.md`
-  2. `docs/plans/PLAN_zod_v4_migration.md` (모든 구현 Task Conclusion 확인)
-- **Action**: Edit File | **Target**: `docs/plans/PLAN_zod_v4_migration.md`
-- **Closeout**: `docs/plans/PLAN_zod_v4_migration.md` (Task TEM-499 `Conclusion`·`Status`)
+  2. `docs/plans/archive/docs/plans` (모든 구현 Task Conclusion 확인)
+- **Action**: Edit File | **Target**: `docs/plans/archive/docs/plans`
+- **Closeout**: `docs/plans/archive/docs/plans` (Task TEM-499 `Conclusion`·`Status`)
 - **Goal**: 선행 Task Conclusion을 근거로 Conclusion and Summary Roll-up 1문단을 실측으로 작성한다.
 
 - **Diagnostics**: 0
-- **Verify**: `just plan-close plan=docs/plans/PLAN_zod_v4_migration.md`
+- **Verify**: `just plan-close plan=docs/plans/archive/docs/plans`
 - **Conclusion**: 모든 구현 Task 완료 확인: TEM-402 스키마 마이그레이션, TEM-403 렌더링 호환성 수정, TEM-404 빌드 검증. plan-lint 통과, npm run build 성공. Roll-up 섹션 실측 작성 완료. [closed-by:plan-task-close]
 - **Dependency**: TEM-404
 
@@ -231,13 +231,13 @@ schema: z.object({
 > 모든 DoD 항목은 기계적으로 자동 검증 가능한 형태로 작성하되, 실행할 명령어는 **반드시 백틱(\`)으로 감싸서** 리스트 항목으로 작성하세요. `[ ]` 체크리스트 포맷은 사용하지 마세요.
 > **Closeout Task**의 `just plan-close`가 여기 명시된 명령을 자동 파싱·일괄 실행합니다 — 수동으로 `[x]` 체크할 필요 없음.
 
-- `just plan-lint docs/plans/PLAN_zod_v4_migration.md`
+- `just plan-lint docs/plans/archive/docs/plans`
 - `npm run build`
 
 ## 검증 행렬
 
 | Scope | Command |
 | :--- | :--- |
-| Blueprint | `just plan-lint docs/plans/PLAN_zod_v4_migration.md` |
+| Blueprint | `just plan-lint docs/plans/archive/docs/plans` |
 | Build | `npm run build` |
 
