@@ -20,6 +20,7 @@ from pathlib import Path
 _CLASSIFICATION_RULES: list[tuple[str, str]] = [
     (r"case", "case"),
     (r"content", "content"),
+    (r"data|schema|db|database", "data"),
     (r"frontend", "frontend"),
     (r"performance", "performance"),
     (r"seo", "seo"),
@@ -32,7 +33,6 @@ _CLASSIFICATION_RULES: list[tuple[str, str]] = [
     (r"auth|security|permission", "security"),
     (r"api|backend|server", "backend"),
     (r"ui|component|theme", "frontend"),
-    (r"data|schema|db|database", "data"),
 ]
 
 # Fallback: extract from filename after "PLAN_" prefix

@@ -32,7 +32,7 @@ import sys
 from pathlib import Path
 from typing import NamedTuple
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+_REPO_ROOT = Path(os.environ.get("ARCHIVE_PLANS_REPO_ROOT", Path(__file__).resolve().parent.parent.parent))
 _PLANS_DIR = _REPO_ROOT / "docs" / "plans"
 _ARCHIVE_DIR = _PLANS_DIR / "archive"
 _PLAN_LOOP_DIR = _REPO_ROOT / "scripts" / "plan_loop"
@@ -606,7 +606,7 @@ def cmd_guard_deleted(args: argparse.Namespace) -> int:
     """Detect deleted git-tracked archive files and restore them."""
     try:
         result = subprocess.run(
-            ["git", "ls-files", "docs/plans/archive/**/*.md"],
+            ["git", "ls-files", "-z", "docs/plans/archive/"],
             cwd=str(_REPO_ROOT),
             capture_output=True,
             text=True,
@@ -619,7 +619,8 @@ def cmd_guard_deleted(args: argparse.Namespace) -> int:
         print(_red(f"❌ git command failed: {result.stderr}"), file=sys.stderr)
         return 1
 
-    tracked_files = [Path(f) for f in result.stdout.strip().split("\n") if f]
+    # git ls-files returns null-separated paths
+    tracked_files = [Path(f) for f in result.stdout.strip().split("\0") if f]
     deleted = []
 
     for fpath in tracked_files:
