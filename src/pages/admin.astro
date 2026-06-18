@@ -1,0 +1,845 @@
+---
+import Layout from '../components/Layout.astro';
+---
+
+<Layout title="Editor | Savior Lab Notes">
+  <div class="admin-page">
+    <nav class="admin-nav">
+      <a href="/" class="admin-nav-brand">Savior Lab Notes</a>
+      <div class="admin-nav-links">
+        <a href="/case">Cases</a>
+        <a href="/admin" class="active">Editor</a>
+      </div>
+    </nav>
+
+    <form id="editor-form" class="admin-editor">
+      <div class="editor-main">
+        <div class="editor-fields">
+          <div class="fields-row">
+            <div class="field">
+              <label for="tag">Tag</label>
+              <div class="custom-select" id="tag-select">
+                <div class="custom-select-trigger" tabindex="0">
+                  <span class="custom-select-value" id="tag-value">선택</span>
+                  <svg class="custom-select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                    <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="custom-select-dropdown" id="tag-dropdown">
+                  <div class="custom-option" data-value="">선택</div>
+                  <div class="custom-option" data-value="Local LLM">Local LLM</div>
+                  <div class="custom-option" data-value="Vibe Coding">Vibe Coding</div>
+                  <div class="custom-option" data-value="Local AI">Local AI</div>
+                </div>
+              </div>
+              <input type="hidden" id="tag" name="tag" required />
+            </div>
+
+            <div class="field">
+              <label for="publishedAt">Published</label>
+              <input type="date" id="publishedAt" name="publishedAt" required />
+            </div>
+          </div>
+
+          <div class="field field-full">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" required placeholder="글 제목" />
+          </div>
+
+          <div class="field field-full" style="display: none;">
+            <label for="summary">Summary</label>
+            <input type="text" id="summary" name="summary" required placeholder="목록에 보이는 요약문" />
+          </div>
+
+          <div class="summary-result" id="summary-result">
+            <div class="summary-result-content">
+              <span class="summary-result-label">Generated Summary</span>
+              <span class="summary-result-text" id="result-summary"></span>
+              <span class="summary-result-label">Thumbnail Preview</span>
+              <div class="thumbnail-preview" id="result-thumbnail"></div>
+            </div>
+            <div class="summary-result-actions">
+              <button type="button" class="btn-result btn-ok" id="btn-ok" disabled>OK</button>
+              <button type="button" class="btn-result btn-retry" id="btn-retry">RETRY</button>
+            </div>
+          </div>
+
+          <div class="field" style="display: none;">
+            <label for="youtubeUrl">YouTube URL</label>
+            <input type="url" id="youtubeUrl" name="youtubeUrl" placeholder="https://youtube.com/..." />
+          </div>
+
+          <div class="field" style="display: none;">
+            <label for="thumbnail">Thumbnail Path</label>
+            <input type="text" id="thumbnail" name="thumbnail" placeholder="/cases/xxx.svg" />
+          </div>
+
+          <div class="field field-full">
+            <label for="content">Content (Markdown)</label>
+            <textarea id="content" name="content" rows="16" placeholder="# 본문 내용을 입력하세요..."></textarea>
+          </div>
+        </div>
+
+        <div class="preview-column">
+          <div class="preview-label">Preview</div>
+          <div class="editor-preview">
+            <div id="preview" class="preview-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-actions">
+        <button type="button" class="btn btn-primary" id="save-btn">Save</button>
+        <button type="submit" class="btn btn-submit" id="submit-btn" disabled>Publish</button>
+        <button type="button" class="btn btn-ghost" id="clear-btn">Clear</button>
+      </div>
+    </form>
+  </div>
+</Layout>
+
+<script is:inline>
+  const form = document.getElementById('editor-form');
+  const preview = document.getElementById('preview');
+  const saveBtn = document.getElementById('save-btn');
+  const submitBtn = document.getElementById('submit-btn');
+  const clearBtn = document.getElementById('clear-btn');
+  const titleInput = document.getElementById('title');
+  const summaryInput = document.getElementById('summary');
+  const contentInput = document.getElementById('content');
+  const thumbnailInput = document.getElementById('thumbnail');
+  const tagSelect = document.getElementById('tag-select');
+  const tagTrigger = document.querySelector('.custom-select-trigger');
+  const tagDropdown = document.getElementById('tag-dropdown');
+  const tagValue = document.getElementById('tag-value');
+  const tagHidden = document.getElementById('tag');
+  const summaryResult = document.getElementById('summary-result');
+  const resultSummary = document.getElementById('result-summary');
+  const resultThumbnail = document.getElementById('result-thumbnail');
+  const btnOk = document.getElementById('btn-ok');
+  const btnRetry = document.getElementById('btn-retry');
+  
+  let editSlug = null;
+  let summaryApproved = false;
+  let llmGenerating = false;
+
+  // Custom select behavior
+  if (tagTrigger && tagDropdown) {
+    tagTrigger.addEventListener('click', () => {
+      tagDropdown.classList.toggle('open');
+    });
+
+    tagTrigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        tagDropdown.classList.toggle('open');
+      }
+    });
+
+    tagDropdown.querySelectorAll('.custom-option').forEach(option => {
+      option.addEventListener('click', () => {
+        const value = option.dataset.value;
+        tagValue.textContent = option.textContent;
+        tagHidden.value = value;
+        tagDropdown.classList.remove('open');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!tagSelect.contains(e.target)) {
+        tagDropdown.classList.remove('open');
+      }
+    });
+  }
+
+  // Check if editing existing post
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('slug');
+  if (slug) {
+    editSlug = slug;
+    submitBtn.textContent = 'Update';
+    summaryApproved = true;
+    fetch(`/api/cases.json`)
+      .then((r) => r.json())
+      .then((cases) => {
+        const c = cases.find((x) => x.slug === slug);
+        if (c) {
+          tagHidden.value = c.tag;
+          tagValue.textContent = c.tag;
+          titleInput.value = c.title;
+          summaryInput.value = c.summary;
+          thumbnailInput.value = c.thumbnail || '';
+          document.getElementById('publishedAt').value = c.publishedAt;
+        }
+      });
+  }
+
+  // Live preview
+  ['title', 'summary', 'content'].forEach((id) => {
+    document.getElementById(id).addEventListener('input', updatePreview);
+  });
+
+  // LLM generation function
+  async function generateFromLLM() {
+    if (llmGenerating) return;
+    
+    const title = titleInput.value.trim();
+    const content = contentInput.value.trim();
+    
+    if (!title && !content) {
+      alert('Title or Content is required');
+      return;
+    }
+
+    llmGenerating = true;
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Generating...';
+    btnOk.disabled = true;
+    summaryResult.style.display = 'flex';
+
+    try {
+      const res = await fetch('/api/llm/generate.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, content }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        resultSummary.textContent = data.summary || '';
+        
+        if (data.svg) {
+          resultThumbnail.innerHTML = data.svg;
+          const svgEl = resultThumbnail.querySelector('svg');
+          if (svgEl) {
+            svgEl.style.width = '100%';
+            svgEl.style.height = '100%';
+            svgEl.style.display = 'block';
+          }
+        } else {
+          resultThumbnail.innerHTML = '';
+        }
+        
+        if (data.summary && data.svg) {
+          btnOk.disabled = false;
+        }
+      } else {
+        alert('Generation failed');
+      }
+    } catch (err) {
+      console.error('LLM generation failed:', err);
+      alert('Generation failed: ' + err.message);
+    } finally {
+      llmGenerating = false;
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save';
+    }
+  }
+
+  // Save button - triggers LLM generation
+  saveBtn.addEventListener('click', generateFromLLM);
+
+  // OK button - approves summary and enables submit
+  btnOk.addEventListener('click', () => {
+    const generatedSummary = resultSummary.textContent;
+    const generatedSvg = resultThumbnail.innerHTML;
+    
+    if (generatedSummary) {
+      summaryInput.value = generatedSummary;
+    }
+    if (generatedSvg) {
+      // Save SVG as data URI for thumbnail field
+      const blob = new Blob([generatedSvg], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      thumbnailInput.value = url;
+    }
+    
+    summaryApproved = true;
+    submitBtn.disabled = false;
+    summaryResult.style.display = 'none';
+  });
+
+  // RETRY button - re-triggers LLM generation (even if previous request is in progress)
+  btnRetry.addEventListener('click', () => {
+    llmGenerating = false;
+    generateFromLLM();
+  });
+
+  function updatePreview() {
+    const title = titleInput.value;
+    const content = contentInput.value;
+    let html = '';
+    // NOTE: Astro scoped CSS does not apply to innerHTML. All styles must be inline.
+    if (title) {
+      html += `<h2 style="font-size:1.5rem;font-weight:800;letter-spacing:-0.02em;margin:0 0 16px;">${escapeHtml(title)}</h2>`;
+      if (content) {
+        html += `<div style="height:1px;background:rgba(98,115,149,0.15);margin:20px 0;"></div>`;
+      }
+    }
+    if (content) {
+      html += content
+        .split('\n\n')
+        .filter(Boolean)
+        .map((p) => {
+          let line = escapeHtml(p);
+          line = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+          line = line.replace(/(?<=^| )\*(.+?)\*(?= |$)/g, '<em>$1</em>');
+          line = line.replace(/^### (.+)$/gm, '<h3 style="font-size:1.05rem;font-weight:600;margin:16px 0 8px;">$1</h3>');
+          line = line.replace(/^## (.+)$/gm, '<h2 style="font-size:1.25rem;font-weight:700;letter-spacing:-0.01em;margin:20px 0 10px;">$1</h2>');
+          line = line.replace(/^# (.+)$/gm, '<h1 style="font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 12px;">$1</h1>');
+          line = line.replace(/^- (.+)$/gm, '<li>$1</li>');
+          if (line.startsWith('<li>')) line = `<ul>${line}</ul>`;
+          if (!line.startsWith('<h') && !line.startsWith('<ul') && !line.startsWith('<li')) {
+            line = `<p style="margin:0 0 12px;">${line}</p>`;
+          }
+          return line;
+        })
+        .join('\n');
+    }
+    preview.innerHTML = html || '<p class="preview-placeholder">마크다운을 입력하면 여기에 표시됩니다</p>';
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Form submit - only works if summary is approved
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    if (!summaryApproved && !editSlug) {
+      alert('Please click OK to approve the generated summary before publishing');
+      return;
+    }
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Publishing...';
+
+    const data = {
+      title: titleInput.value,
+      tag: tagHidden.value,
+      summary: summaryInput.value,
+      publishedAt: document.getElementById('publishedAt').value,
+      content: contentInput.value,
+      youtubeUrl: document.getElementById('youtubeUrl').value || undefined,
+      thumbnail: thumbnailInput.value || undefined,
+      slug: slugify(titleInput.value),
+      editSlug: editSlug || undefined,
+    };
+
+    try {
+      const res = await fetch('/api/cases/write.json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (result.ok) {
+        if (!editSlug) {
+          editSlug = result.slug;
+          submitBtn.textContent = 'Update';
+        }
+        submitBtn.textContent = 'Published!';
+        setTimeout(() => { 
+          submitBtn.textContent = editSlug ? 'Update' : 'Publish';
+        }, 2000);
+      } else {
+        alert('Error: ' + (result.error || 'Unknown error'));
+      }
+    } catch (err) {
+      alert('Failed to publish: ' + err);
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  // Clear form
+  clearBtn.addEventListener('click', () => {
+    form.reset();
+    preview.innerHTML = '';
+    editSlug = null;
+    submitBtn.textContent = 'Publish';
+    submitBtn.disabled = true;
+    summaryApproved = false;
+    summaryResult.style.display = 'none';
+    btnOk.disabled = true;
+    tagValue.textContent = '선택';
+    tagHidden.value = '';
+  });
+
+  function slugify(text) {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9가-힣]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 80);
+  }
+
+  updatePreview();
+</script>
+
+<style>
+  .admin-page {
+    max-width: 1080px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 72px 48px 104px;
+  }
+
+  .admin-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 32px;
+  }
+
+  .admin-nav-brand {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--foreground);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+  }
+
+  .admin-nav-links {
+    display: flex;
+    gap: 16px;
+  }
+
+  .admin-nav-links a {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 120ms ease;
+  }
+
+  .admin-nav-links a:hover {
+    color: var(--foreground);
+    background: color-mix(in srgb, var(--card) 60%, var(--background));
+  }
+
+  .admin-nav-links a.active {
+    color: var(--accent);
+    background: color-mix(in srgb, #edf2ff 50%, var(--card));
+  }
+
+  .admin-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .editor-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 20px;
+    min-height: 500px;
+  }
+
+  .editor-fields,
+  .preview-column {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .preview-column {
+    grid-column: 2;
+    min-height: 0;
+  }
+
+  .editor-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .field-full {
+    flex: 1;
+  }
+
+  .field label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .field input,
+  .field textarea {
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--foreground);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 120ms ease;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .field select {
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--foreground);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 120ms ease;
+    width: 100%;
+    max-width: 240px;
+    box-sizing: border-box;
+  }
+
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    border-color: var(--accent);
+  }
+
+  .custom-select {
+    position: relative;
+    width: 100%;
+    max-width: 240px;
+  }
+
+  .custom-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--foreground);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: border-color 120ms ease;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .custom-select-trigger:hover {
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--line));
+  }
+
+  .custom-select-trigger:focus {
+    border-color: var(--accent);
+    outline: none;
+  }
+
+  .custom-select-arrow {
+    flex-shrink: 0;
+    color: var(--muted);
+    transition: transform 120ms ease;
+  }
+
+  .custom-select-dropdown.open .custom-select-arrow {
+    transform: rotate(180deg);
+  }
+
+  .custom-select-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 4px;
+    z-index: 100;
+    min-width: 100%;
+    max-width: 240px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .custom-select-dropdown.open {
+    display: block;
+  }
+
+  .custom-option {
+    padding: 8px 12px;
+    font-size: 14px;
+    color: var(--foreground);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 120ms ease;
+  }
+
+  .custom-option:hover {
+    background: color-mix(in srgb, var(--accent) 10%, var(--card));
+  }
+
+  .custom-option.selected {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .field textarea {
+    resize: none;
+    line-height: 1.7;
+    overflow-y: auto;
+  }
+
+  .editor-preview {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--card);
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .preview-column {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+  }
+
+  .preview-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .preview-content {
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--foreground);
+    padding: 20px 24px;
+  }
+
+  .preview-content h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+  }
+
+  .preview-content h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .preview-content h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 16px 0 8px;
+  }
+
+  .preview-content p {
+    margin: 0 0 12px;
+    color: var(--foreground);
+  }
+
+  .preview-content strong {
+    font-weight: 700;
+  }
+
+  .preview-content em {
+    font-style: italic;
+  }
+
+  .preview-content ul {
+    margin: 0 0 12px;
+    padding-left: 20px;
+  }
+
+  .preview-content li {
+    margin-bottom: 4px;
+  }
+
+  .preview-placeholder {
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .editor-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 10px 24px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 120ms ease;
+    font-family: inherit;
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: transparent;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    background: color-mix(in srgb, #edf2ff 40%, var(--card));
+    color: var(--muted);
+  }
+
+  .btn-ghost:hover {
+    color: var(--foreground);
+  }
+
+  .btn-submit {
+    background: #10b981;
+    color: #fff;
+    border-color: transparent;
+  }
+
+  .btn-submit:hover:not(:disabled) {
+    background: #059669;
+    transform: translateY(-1px);
+  }
+
+  .btn-result {
+    padding: 6px 16px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 120ms ease;
+  }
+
+  .btn-ok {
+    background: #10b981;
+    color: #fff;
+  }
+
+  .btn-ok:hover:not(:disabled) {
+    background: #059669;
+  }
+
+  .btn-retry {
+    background: var(--card);
+    color: var(--muted);
+    border: 1px solid var(--line);
+  }
+
+  .btn-retry:hover:not(:disabled) {
+    color: var(--foreground);
+    border-color: var(--muted);
+  }
+
+  .summary-result {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 16px;
+    background: color-mix(in srgb, var(--accent) 8%, var(--card));
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+  }
+
+  .summary-result-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .summary-result-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .summary-result-text {
+    font-size: 13px;
+    color: var(--foreground);
+    line-height: 1.5;
+  }
+
+  .thumbnail-preview {
+    width: 100%;
+    flex: 1;
+    min-width: 0;
+    height: 120px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .thumbnail-preview svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .thumbnail-fallback {
+    font-size: 12px;
+    color: var(--muted);
+    word-break: break-all;
+    padding: 8px;
+  }
+
+  .summary-result-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  @media (max-width: 720px) {
+    .editor-main {
+      grid-template-columns: 1fr;
+    }
+
+    .editor-preview {
+      max-height: none;
+    }
+  }
+</style>
