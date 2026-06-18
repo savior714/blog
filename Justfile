@@ -10,6 +10,10 @@ ci:
     @echo "Running blog CI (bootstrap kernel)..."
     @just verify
 
+test:
+    @echo "Running Astro/Vitest tests..."
+    @npx vitest --config vitest.config.ts --run
+
 lint-turn-end:
     @echo "Turn-end gate (bootstrap kernel — extend per project)"
     @just verify

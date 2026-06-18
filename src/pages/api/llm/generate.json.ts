@@ -4,6 +4,104 @@ export const prerender = false;
 
 const LM_STUDIO_URL = (process as any).env?.LM_STUDIO_URL || 'http://127.0.0.1:1234/v1';
 
+export function generateFallbackSummary(title: string, content: string): { summary: string; svg: string } {
+  // Clean markdown: remove code blocks, images, links, headers, horizontal rules
+  let text = (content || '')
+    .replace(/```[\s\S]*?```/g, '')           // code blocks
+    .replace(/`[^`]+`/g, '')                   // inline code
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, '')      // images
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')   // links (keep text)
+    .replace(/^#{1,6}\s+.+$/gm, '')            // headers
+    .replace(/^---+$/gm, '')                   // frontmatter separators
+    .replace(/^\|.*\|$/gm, '')                 // tables
+    .replace(/\n+/g, ' ')                      // normalize whitespace
+    .trim();
+  
+  // Multi-language sentence splitting: English, Korean, Chinese, Japanese
+  const sentences = text.match(/[^.!?。！？\s][^.!?。！？\s]*?[.!?。！？]\s*/g)
+    || [];
+  
+  let summary = '';
+  
+  if (sentences.length > 0) {
+    // Score sentences: prefer first meaningful sentences (15-80 chars)
+    const scored = sentences.map((s, i) => {
+      const clean = s.trim();
+      if (!clean || clean.length < 10) return { text: clean, score: 0 };
+      if (clean.length > 100) return { text: clean, score: 0.5 }; // too long, lower priority
+      const lengthScore = 1 / Math.log(2 + clean.length / 10);
+      const positionScore = 1 / (1 + i * 0.5); // earlier sentences weighted higher
+      return { text: clean, score: lengthScore + positionScore };
+    });
+    
+    // Take top 2 sentences, preserve original order
+    const top = scored
+      .filter(s => s.score > 0)
+      .slice(0, 2);
+    
+    // Sort by original position to maintain coherence
+    top.sort((a, b) => sentences.indexOf(a.text) - sentences.indexOf(b.text));
+    summary = top.map(s => s.text).join(' ').trim();
+  }
+
+  const allTitleWords = (title || 'Post').split(/\s+/);
+  const safeSummary = (summary || title || 'Untitled')
+    .slice(0, 50)
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/&/g, '&amp;');
+  
+  // Build title up to max 16 characters for readability
+  const maxTitleChars = 16;
+  let displayTitle = '';
+  for (const word of allTitleWords) {
+    const candidate = displayTitle ? displayTitle + ' ' + word : word;
+    if (candidate.length <= maxTitleChars && candidate.trim()) {
+      displayTitle = candidate;
+    } else {
+      break;
+    }
+  }
+  displayTitle = displayTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;');
+  
+  // Determine if title needs 2 lines (more than ~14 chars)
+  const titleNeedTwoLines = displayTitle.length > 14;
+  
+  let titleText1 = '';
+  let titleText2 = '';
+  if (titleNeedTwoLines) {
+    // Split into two lines at word boundary
+    const midPoint = Math.ceil(displayTitle.length / 2);
+    const lastSpace = displayTitle.lastIndexOf(' ', midPoint);
+    if (lastSpace > 4) {
+      titleText1 = displayTitle.slice(0, lastSpace);
+      titleText2 = displayTitle.slice(lastSpace + 1);
+    } else {
+      titleText1 = displayTitle.slice(0, midPoint).trim();
+      titleText2 = displayTitle.slice(midPoint).trim();
+    }
+  }
+  
+  return {
+    summary: summary || (title || 'Untitled').slice(0, 200),
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225">
+      <defs>
+        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#667eea"/>
+          <stop offset="100%" style="stop-color:#764ba2"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="225" fill="url(#bg)"/>
+      <circle cx="320" cy="50" r="80" fill="rgba(255,255,255,0.1)"/>
+      <circle cx="80" cy="180" r="60" fill="rgba(255,255,255,0.1)"/>
+      ${titleNeedTwoLines ? `<text x="200" y="85" text-anchor="middle" fill="white" font-size="20" font-family="Arial, sans-serif" font-weight="bold">${titleText1}</text>
+      <text x="200" y="111" text-anchor="middle" fill="white" font-size="20" font-family="Arial, sans-serif" font-weight="bold">${titleText2}</text>` : `<text x="200" y="95" text-anchor="middle" fill="white" font-size="20" font-family="Arial, sans-serif" font-weight="bold">${displayTitle}</text>`}
+      <line x1="150" y1="${titleNeedTwoLines ? 131 : 115}" x2="250" y2="${titleNeedTwoLines ? 131 : 115}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+      <text x="200" y="${titleNeedTwoLines ? 161 : 145}" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="12" font-family="Arial, sans-serif">${safeSummary}</text>
+    </svg>`
+  };
+}
+
 export const POST: APIRoute = async (context) => {
   try {
     const request = context.request;
@@ -68,7 +166,7 @@ IMPORTANT: Do NOT use textLength or lengthAdjust attributes.
 Respond in JSON format only:
 {
   "summary": "actual summary text here",
-  "svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 225'>...actual SVG with real text, ALL text elements MUST have textLength and lengthAdjust attributes...</svg>"
+  "svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 225'>...actual SVG with real text...</svg>"
 }`;
 
     let parsed;

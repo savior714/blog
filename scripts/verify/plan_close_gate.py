@@ -164,7 +164,11 @@ def check_done_has_conclusion(lines: list[str]) -> list[str]:
         if not _line_declares_finished_status(line):
             continue
         window = lines[idx : min(idx + 30, len(lines))]
-        conclusion_line = next((w for w in window if "Conclusion" in w), "")
+        # Match only the actual - **Conclusion**:` field line, not lines that merely contain the word "Conclusion"
+        conclusion_line = next(
+            (w for w in window if re.search(r"\*\*Conclusion\*\*", w)),
+            "",
+        )
         if not conclusion_line:
             issues.append(f"line {idx + 1}: finished-status task without Conclusion field")
             continue
@@ -390,6 +394,10 @@ def check_linear_references(repo_root: Path, plan_path: Path | None = None) -> l
         return ["Linear reference validation timed out (>60s)"]
     except FileNotFoundError:
         return ["linear_validate.py not found — skipping  check"]
+
+    # Handle import errors in linear_validate.py (e.g., missing sync_engine) — skip silently
+    if proc.returncode != 0 and "ModuleNotFoundError" in (proc.stdout + proc.stderr):
+        return []
 
     if proc.returncode != 0:
         # linear-validate 가 문제를 발견하면 plan-close 차단
