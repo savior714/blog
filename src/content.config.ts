@@ -1,14 +1,15 @@
 import { z, defineCollection } from 'astro:content';
+import { glob } from 'astro/loaders';
 
 const casesCollection = defineCollection({
-  type: 'content',
+  loader: glob({ pattern: '**/*.md', base: './src/content/cases' }),
   schema: z.object({
     tag: z.enum(['Local LLM', 'Vibe Coding', 'Local AI']),
     title: z.string(),
     summary: z.string(),
-    thumbnail: z.string().optional(),
-    youtubeUrl: z.string().optional(),
-    publishedAt: z.string(),
+    thumbnail: z.string().url().or(z.string().startsWith('/')).optional(),
+    youtubeUrl: z.string().url().optional(),
+    publishedAt: z.coerce.date(),
   }),
 });
 
