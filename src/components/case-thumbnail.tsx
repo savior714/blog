@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { CasePost, getCaseThumbnailKeywords } from "@/lib/cases";
 
 type CaseThumbnailProps = {
@@ -14,11 +13,9 @@ export function CaseThumbnail({ post, variant }: CaseThumbnailProps) {
   if (shouldUseImage && post.thumbnail) {
     return (
       <div className={wrapClass}>
-        <Image
+        <img
           src={post.thumbnail}
           alt={post.title}
-          width={1200}
-          height={675}
           className={imageClass}
         />
       </div>
