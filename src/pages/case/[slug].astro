@@ -1,36 +1,57 @@
 ---
 import Layout from '../../components/Layout.astro';
-import { getCollection } from 'astro:content';
+import { SITE_URL } from '../../config/site';
+import { getCollection, getEntry, render } from 'astro:content';
+import { Picture } from 'astro:assets';
 
 export async function getStaticPaths() {
   const cases = await getCollection('cases');
   return cases.map((entry) => ({
     params: { slug: entry.slug },
-    props: {
-      tag: entry.data.tag,
-      title: entry.data.title,
-      summary: entry.data.summary,
-      publishedAt: entry.data.publishedAt,
-      youtubeUrl: entry.data.youtubeUrl || '',
-      thumbnail: entry.data.thumbnail || '',
-      content: entry.body,
-    },
   }));
 }
 
-const { tag, title, summary, publishedAt, youtubeUrl, thumbnail, content } = Astro.props;
+const slug = Astro.params.slug;
+const entry = await getEntry('cases', slug);
 
-function escapeHtml(text) {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+if (!entry) {
+  return {
+    state: 'notFound',
+  };
 }
+
+const { tag, title, summary, publishedAt, youtubeUrl, thumbnail } = entry.data;
+
+const ogImage = thumbnail || `${SITE_URL}/og-default.png`;
+const ogUrl = `${SITE_URL}/case/${slug}`;
+
+const { Content } = await render(entry);
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description: summary,
+  datePublished: publishedAt.toISOString(),
+  author: { '@type': 'Organization', name: 'Savior Lab Notes' },
+  mainEntityOfPage: ogUrl,
+  image: ogImage,
+};
 ---
 
-<Layout title={`${title} | Savior Lab Notes`} description={summary}>
+<Layout
+  title={`${title} | Savior Lab Notes`}
+  description={summary}
+  ogImage={ogImage}
+  ogUrl={ogUrl}
+  ogType="article"
+  publishedAt={publishedAt.toISOString()}
+  tag={tag}
+>
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(articleSchema)}
+  />
   <div class="admin-page">
     <nav class="admin-nav">
       <a href="/" class="admin-nav-brand">Savior Lab Notes</a>
@@ -41,33 +62,30 @@ function escapeHtml(text) {
     </nav>
 
     <article class="case-article">
-      <a href="/case" class="back-link">← Cases</a>
+      <a href="/case" class="back-link text-muted">← Cases</a>
 
       <header class="article-header">
-        <span class="article-tag">{tag}</span>
+        <span class="article-tag text-accent">{tag}</span>
         <h1>{title}</h1>
-        <div class="article-meta">
-          <time>{publishedAt}</time>
+        <div class="article-meta text-muted">
+          <time>{new Date(publishedAt).toLocaleDateString('ko-KR')}</time>
           {youtubeUrl && (
-            <a href={youtubeUrl} target="_blank" rel="noreferrer">YouTube ↗</a>
+            <a href={youtubeUrl} target="_blank" rel="noreferrer" class="text-accent">YouTube ↗</a>
           )}
         </div>
       </header>
 
       {thumbnail && (
         <div class="detail-thumb-wrap">
-          <img src={thumbnail} alt={title} class="detail-thumb" />
+          <Picture src={thumbnail} alt={title} class="detail-thumb" formats={['avif', 'webp']} loading="lazy" />
         </div>
       )}
 
       <div class="article-content">
-        {content.split('\n\n')
-          .filter(Boolean)
-          .map((p) => `<p>${escapeHtml(p)}</p>`)
-          .join('\n')}
+        <Content />
       </div>
 
-      <a href="/case" class="back-link">← Cases</a>
+      <a href="/case" class="back-link text-muted">← Cases</a>
     </article>
   </div>
 </Layout>

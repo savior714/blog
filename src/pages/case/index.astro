@@ -1,5 +1,16 @@
 ---
 import Layout from '../../components/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const cases = (await getCollection('cases')).sort((a, b) =>
+  b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
+);
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return [{ params: {} }];
+}
 ---
 
 <Layout title="Cases | Savior Lab Notes">
@@ -7,7 +18,7 @@ import Layout from '../../components/Layout.astro';
     <nav class="admin-nav">
       <a href="/" class="admin-nav-brand">Savior Lab Notes</a>
       <div class="admin-nav-links">
-        <a href="/case" class="active">Cases</a>
+        <a href="/case" class="active text-accent">Cases</a>
         <a href="/editor">Editor</a>
       </div>
     </nav>
@@ -18,42 +29,23 @@ import Layout from '../../components/Layout.astro';
         <p class="cases-lead">바이브코딩과 로컬 AI 실험을 케이스 단위로 기록합니다.</p>
       </header>
 
-      <div id="cases-list" class="cases-grid">
-        <p class="loading">로딩 중...</p>
-      </div>
+      {cases.length === 0 ? (
+        <p class="empty">등록된 사례가 없습니다.</p>
+      ) : (
+        <div class="cases-grid">
+          {cases.map((c) => (
+            <a href={`/case/${c.slug}`} class="case-card bg-card">
+              <span class="case-tag text-accent">{c.data.tag}</span>
+              <h3>{c.data.title}</h3>
+              <p>{c.data.summary}</p>
+              <span class="case-date">{new Date(c.data.publishedAt).toLocaleDateString('ko-KR')}</span>
+            </a>
+          ))}
+        </div>
+      )}
     </main>
   </div>
 </Layout>
-
-<script is:inline>
-  const list = document.getElementById('cases-list');
-
-  fetch('/api/cases.json')
-    .then((r) => r.json())
-    .then((cases) => {
-      if (!cases.length) {
-        list.innerHTML = '<p class="empty">등록된 사례가 없습니다.</p>';
-        return;
-      }
-      list.innerHTML = cases.map((c) => `
-        <a href="/case/${c.slug}" class="case-card">
-          <span class="case-tag">${escapeHtml(c.tag)}</span>
-          <h3>${escapeHtml(c.title)}</h3>
-          <p>${escapeHtml(c.summary)}</p>
-          <span class="case-date">${c.publishedAt}</span>
-        </a>
-      `).join('');
-    })
-    .catch(() => {
-      list.innerHTML = '<p class="error">사례를 불러오지 못했습니다.</p>';
-    });
-
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-</script>
 
 <style>
   .admin-page {

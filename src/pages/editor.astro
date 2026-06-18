@@ -1,4 +1,5 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 ---
 
@@ -98,6 +99,11 @@ import Layout from '../components/Layout.astro';
 </Layout>
 
 <script is:inline>
+  // Production guard: hide editor on Vercel unless EDITOR_SECRET is set
+  if (import.meta.env.VERCEL_ENV === 'production' && !import.meta.env.Editor_Secret) {
+    window.location.replace('/');
+  }
+
   const form = document.getElementById('editor-form');
   const preview = document.getElementById('preview');
   const saveBtn = document.getElementById('save-btn');
