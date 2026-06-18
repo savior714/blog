@@ -1,0 +1,83 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../components/Layout.astro';
+import Footer from '../../components/Footer.astro';
+import CaseThumbnail from '../../components/CaseThumbnail.astro';
+import ArrowRightIcon from '../../components/ArrowRightIcon.astro';
+import HomeIcon from '../../components/HomeIcon.astro';
+import PlayIcon from '../../components/PlayIcon.astro';
+import type { CasePost } from '../../lib/cases';
+import { hasYoutubeVideo } from '../../lib/cases';
+
+export async function getStaticPaths() {
+  const cases = await getCollection('cases');
+  return cases.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { caseEntry: entry },
+  }));
+}
+
+const { caseEntry } = Astro.props;
+const data = caseEntry.data as CasePost;
+const rawContent = caseEntry.body;
+
+const allCases = await getCollection('cases');
+const sortedCases = allCases.sort((a, b) =>
+  b.data.publishedAt.localeCompare(a.data.publishedAt)
+);
+const caseIndex = sortedCases.findIndex((c) => c.slug === data.slug);
+const caseNumber = caseIndex >= 0 ? caseIndex + 1 : null;
+
+const title = caseNumber ? `#${caseNumber} ${data.title} | Savior Lab Notes` : `${data.title} | Savior Lab Notes`;
+---
+
+<Layout title={title} description={data.summary} />
+
+<main class="page magazine-page">
+  <nav class="top-nav">
+    <a href="/" class="inline-link">
+      <HomeIcon className="inline-link-icon" />
+      홈으로
+    </a>
+    <a href="/case" class="inline-link">
+      사례 목록
+    </a>
+  </nav>
+  <article class="case-article editorial-article">
+    <header class="article-hero">
+      <p class="eyebrow">{data.tag}</p>
+      <h1>{caseNumber ? `#${caseNumber} ` : ''}{data.title}</h1>
+      <p class="lead">{data.summary}</p>
+      <CaseThumbnail post={data} variant="detail" />
+    </header>
+
+    <div class="meta-row">
+      <span>{data.publishedAt}</span>
+      {hasYoutubeVideo(data) && data.youtubeUrl ? (
+        <a href={data.youtubeUrl} target="_blank" rel="noreferrer" class="inline-link">
+          <PlayIcon className="inline-link-icon" />
+          연결 영상 보기
+        </a>
+      ) : (
+        <span>영상 링크 준비 중</span>
+      )}
+    </div>
+
+    <section class="content-block editorial-content">
+      {rawContent.split('\n\n').map((paragraph) => {
+        const trimmed = paragraph.trim();
+        if (!trimmed) return null;
+        return <p>{trimmed}</p>;
+      })}
+    </section>
+
+    <div class="back-link">
+      <a href="/case" class="inline-link">
+        <ArrowRightIcon className="inline-link-icon back" />
+        전체 사례로 돌아가기
+      </a>
+    </div>
+  </article>
+</main>
+
+<Footer />
