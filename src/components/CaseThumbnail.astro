@@ -1,0 +1,37 @@
+---
+import type { CasePost } from '../lib/cases';
+import { getCaseThumbnailKeywords } from '../lib/cases';
+
+interface Props {
+  post: CasePost;
+  variant: 'card' | 'detail';
+}
+
+const { post, variant } = Astro.props;
+
+const wrapClass = variant === 'detail' ? 'detail-thumb-wrap' : 'thumb-wrap';
+const imageClass = variant === 'detail' ? 'detail-thumb' : 'thumb';
+const shouldUseImage = Boolean(post.thumbnail);
+
+const keywords = getCaseThumbnailKeywords(post, 3);
+const generatedThumbClass = `${wrapClass} generated-thumb`;
+---
+
+{shouldUseImage && post.thumbnail ? (
+  <div class={wrapClass}>
+    <img src={post.thumbnail} alt={post.title} class={imageClass} loading="lazy" />
+  </div>
+) : (
+  <div class={generatedThumbClass}>
+    <svg class="generated-thumb-orb" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="110" cy="110" r="84" />
+    </svg>
+    <p class="generated-thumb-tag">{post.tag}</p>
+    <p class="generated-thumb-title">{post.title}</p>
+    <div class="generated-thumb-keywords">
+      {keywords.map((keyword) => (
+        <span key={keyword}>#{keyword}</span>
+      ))}
+    </div>
+  </div>
+)}

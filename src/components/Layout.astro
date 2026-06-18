@@ -1,0 +1,28 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Case notes on vibe coding and local AI workflows.' } = Astro.props;
+---
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  </head>
+  <body class="min-h-full flex flex-col">
+    <style is:global>
+@import "../styles/global.css";
+    </style>
+    <slot />
+  </body>
+</html>
