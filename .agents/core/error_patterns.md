@@ -14,8 +14,10 @@ patterns_file: .agents/core/error_patterns/patterns.yaml
 
 # Error Patterns — 에이전트가 자주 하는 실수
 
+> **AGENTS.md §1.8 요약본 포함** — 메인 에이전트 컨텍스트 always-on. 상세·WRONG/CORRECT 예시: [error_patterns/detail/](error_patterns/detail/) lazy-load.
+
 에이전트가 작업을 진행할 때 반복적으로 저지르는 실수들을 기록합니다.
-**헤더(본 문서)** = 라우팅·**TOP 4**·**메타 금지 11** normative SSOT (always-on). TOP 5–9·WRONG/CORRECT = `error_patterns/detail/` **lazy-load**. **규범 SSOT**: 편집 도구 → [runtime_edit_tools.md](runtime_edit_tools.md) (Cursor) · 상세 → [routing.md](routing.md) §1 · AGENTS → [AGENTS.md §2](../../AGENTS.md).
+**헤더(본 문서)** = 라우팅·**TOP 4**·**메타 금지 11** normative SSOT (always-on). TOP 5–9·WRONG/CORRECT = `error_patterns/detail/` **lazy-load**. **규범 SSOT**: 편집 도구 → [runtime_edit_tools.md](runtime_edit_tools.md) (Cursor) · 상세 → [routing.md](routing.md) §1 · AGENTS → [AGENTS.md §1.8].
 
 ### 언제 어떤 문서를 볼지
 
