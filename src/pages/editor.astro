@@ -47,32 +47,9 @@ import Layout from '../components/Layout.astro';
             <input type="text" id="title" name="title" required placeholder="글 제목" />
           </div>
 
-          <div class="field field-full" style="display: none;">
-            <label for="summary">Summary</label>
-            <input type="text" id="summary" name="summary" required placeholder="목록에 보이는 요약문" />
-          </div>
-
-          <div class="summary-result" id="summary-result">
-            <div class="summary-result-content">
-              <span class="summary-result-label">Generated Summary</span>
-              <span class="summary-result-text" id="result-summary"></span>
-              <span class="summary-result-label">Thumbnail Preview</span>
-              <div class="thumbnail-preview" id="result-thumbnail"></div>
-            </div>
-            <div class="summary-result-actions">
-              <button type="button" class="btn-result btn-ok" id="btn-ok" disabled>OK</button>
-              <button type="button" class="btn-result btn-retry" id="btn-retry">RETRY</button>
-            </div>
-          </div>
-
           <div class="field" style="display: none;">
             <label for="youtubeUrl">YouTube URL</label>
             <input type="url" id="youtubeUrl" name="youtubeUrl" placeholder="https://youtube.com/..." />
-          </div>
-
-          <div class="field" style="display: none;">
-            <label for="thumbnail">Thumbnail Path</label>
-            <input type="text" id="thumbnail" name="thumbnail" placeholder="/cases/xxx.svg" />
           </div>
 
           <div class="field field-full">
@@ -90,7 +67,6 @@ import Layout from '../components/Layout.astro';
       </div>
 
       <div class="editor-actions">
-        <button type="button" class="btn btn-primary" id="save-btn">Save</button>
         <button type="submit" class="btn btn-submit" id="submit-btn" disabled>Publish</button>
         <button type="button" class="btn btn-ghost" id="clear-btn">Clear</button>
       </div>
@@ -106,27 +82,17 @@ import Layout from '../components/Layout.astro';
 
   const form = document.getElementById('editor-form');
   const preview = document.getElementById('preview');
-  const saveBtn = document.getElementById('save-btn');
   const submitBtn = document.getElementById('submit-btn');
   const clearBtn = document.getElementById('clear-btn');
   const titleInput = document.getElementById('title');
-  const summaryInput = document.getElementById('summary');
   const contentInput = document.getElementById('content');
-  const thumbnailInput = document.getElementById('thumbnail');
   const tagSelect = document.getElementById('tag-select');
   const tagTrigger = document.querySelector('.custom-select-trigger');
   const tagDropdown = document.getElementById('tag-dropdown');
   const tagValue = document.getElementById('tag-value');
   const tagHidden = document.getElementById('tag');
-  const summaryResult = document.getElementById('summary-result');
-  const resultSummary = document.getElementById('result-summary');
-  const resultThumbnail = document.getElementById('result-thumbnail');
-  const btnOk = document.getElementById('btn-ok');
-  const btnRetry = document.getElementById('btn-retry');
   
   let editSlug = null;
-  let summaryApproved = false;
-  let llmGenerating = false;
 
   // Custom select behavior
   if (tagTrigger && tagDropdown) {
@@ -163,7 +129,6 @@ import Layout from '../components/Layout.astro';
   if (slug) {
     editSlug = slug;
     submitBtn.textContent = 'Update';
-    summaryApproved = true;
     fetch(`/api/cases.json`)
       .then((r) => r.json())
       .then((cases) => {
@@ -172,102 +137,14 @@ import Layout from '../components/Layout.astro';
           tagHidden.value = c.tag;
           tagValue.textContent = c.tag;
           titleInput.value = c.title;
-          summaryInput.value = c.summary;
-          thumbnailInput.value = c.thumbnail || '';
           document.getElementById('publishedAt').value = c.publishedAt;
         }
       });
   }
 
   // Live preview
-  ['title', 'summary', 'content'].forEach((id) => {
+  ['title', 'content'].forEach((id) => {
     document.getElementById(id).addEventListener('input', updatePreview);
-  });
-
-  // LLM generation function
-  async function generateFromLLM() {
-    if (llmGenerating) return;
-    
-    const title = titleInput.value.trim();
-    const content = contentInput.value.trim();
-    
-    if (!title && !content) {
-      alert('Title or Content is required');
-      return;
-    }
-
-    llmGenerating = true;
-    saveBtn.disabled = true;
-    saveBtn.textContent = 'Generating...';
-    btnOk.disabled = true;
-    summaryResult.style.display = 'flex';
-
-    try {
-      const res = await fetch('/api/llm/generate.json', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, content }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        resultSummary.textContent = data.summary || '';
-        
-        if (data.svg) {
-          resultThumbnail.innerHTML = data.svg;
-          const svgEl = resultThumbnail.querySelector('svg');
-          if (svgEl) {
-            svgEl.style.width = '100%';
-            svgEl.style.height = '100%';
-            svgEl.style.display = 'block';
-          }
-        } else {
-          resultThumbnail.innerHTML = '';
-        }
-        
-        if (data.summary && data.svg) {
-          btnOk.disabled = false;
-        }
-      } else {
-        alert('Generation failed');
-      }
-    } catch (err) {
-      console.error('LLM generation failed:', err);
-      alert('Generation failed: ' + err.message);
-    } finally {
-      llmGenerating = false;
-      saveBtn.disabled = false;
-      saveBtn.textContent = 'Save';
-    }
-  }
-
-  // Save button - triggers LLM generation
-  saveBtn.addEventListener('click', generateFromLLM);
-
-  // OK button - approves summary and enables submit
-  btnOk.addEventListener('click', () => {
-    const generatedSummary = resultSummary.textContent;
-    const generatedSvg = resultThumbnail.innerHTML;
-    
-    if (generatedSummary) {
-      summaryInput.value = generatedSummary;
-    }
-    if (generatedSvg) {
-      // Save SVG as data URI for thumbnail field
-      const blob = new Blob([generatedSvg], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(blob);
-      thumbnailInput.value = url;
-    }
-    
-    summaryApproved = true;
-    submitBtn.disabled = false;
-    summaryResult.style.display = 'none';
-  });
-
-  // RETRY button - re-triggers LLM generation (even if previous request is in progress)
-  btnRetry.addEventListener('click', () => {
-    llmGenerating = false;
-    generateFromLLM();
   });
 
   function updatePreview() {
@@ -310,14 +187,9 @@ import Layout from '../components/Layout.astro';
     return div.innerHTML;
   }
 
-  // Form submit - only works if summary is approved
+  // Form submit
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    if (!summaryApproved && !editSlug) {
-      alert('Please click OK to approve the generated summary before publishing');
-      return;
-    }
     
     submitBtn.disabled = true;
     submitBtn.textContent = 'Publishing...';
@@ -325,11 +197,9 @@ import Layout from '../components/Layout.astro';
     const data = {
       title: titleInput.value,
       tag: tagHidden.value,
-      summary: summaryInput.value,
       publishedAt: document.getElementById('publishedAt').value,
       content: contentInput.value,
       youtubeUrl: document.getElementById('youtubeUrl').value || undefined,
-      thumbnail: thumbnailInput.value || undefined,
       slug: slugify(titleInput.value),
       editSlug: editSlug || undefined,
     };
@@ -367,9 +237,6 @@ import Layout from '../components/Layout.astro';
     editSlug = null;
     submitBtn.textContent = 'Publish';
     submitBtn.disabled = true;
-    summaryApproved = false;
-    summaryResult.style.display = 'none';
-    btnOk.disabled = true;
     tagValue.textContent = '선택';
     tagHidden.value = '';
   });
@@ -743,100 +610,6 @@ import Layout from '../components/Layout.astro';
   .btn-submit:hover:not(:disabled) {
     background: #059669;
     transform: translateY(-1px);
-  }
-
-  .btn-result {
-    padding: 6px 16px;
-    font-size: 12px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 120ms ease;
-  }
-
-  .btn-ok {
-    background: #10b981;
-    color: #fff;
-  }
-
-  .btn-ok:hover:not(:disabled) {
-    background: #059669;
-  }
-
-  .btn-retry {
-    background: var(--card);
-    color: var(--muted);
-    border: 1px solid var(--line);
-  }
-
-  .btn-retry:hover:not(:disabled) {
-    color: var(--foreground);
-    border-color: var(--muted);
-  }
-
-  .summary-result {
-    display: none;
-    flex-direction: column;
-    gap: 10px;
-    padding: 14px 16px;
-    background: color-mix(in srgb, var(--accent) 8%, var(--card));
-    border: 1px solid var(--accent);
-    border-radius: 10px;
-  }
-
-  .summary-result-content {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .summary-result-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-
-  .summary-result-text {
-    font-size: 13px;
-    color: var(--foreground);
-    line-height: 1.5;
-  }
-
-  .thumbnail-preview {
-    width: 100%;
-    flex: 1;
-    min-width: 0;
-    height: 120px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    overflow: hidden;
-    background: var(--card);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-  }
-
-  .thumbnail-preview svg {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-
-  .thumbnail-fallback {
-    font-size: 12px;
-    color: var(--muted);
-    word-break: break-all;
-    padding: 8px;
-  }
-
-  .summary-result-actions {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
   }
 
   @media (max-width: 720px) {
