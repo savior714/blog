@@ -8,6 +8,22 @@ const cases = (await getCollection('cases')).sort((a, b) =>
 );
 
 const recentCases = cases.slice(0, 3);
+
+// This Week: articles published this week (Monday-based)
+const now = new Date();
+const dayOfWeek = now.getDay();
+const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+const weekStart = new Date(now);
+weekStart.setDate(now.getDate() + mondayOffset);
+weekStart.setHours(0, 0, 0, 0);
+
+const weekEnd = new Date(weekStart);
+weekEnd.setDate(weekStart.getDate() + 7);
+
+const thisWeekCases = cases.filter((c) => {
+  const ts = c.data.publishedAt.getTime();
+  return ts >= weekStart.getTime() && ts < weekEnd.getTime();
+});
 ---
 
 <Layout title="Savior Lab Notes | Build with AI, Ship with Clarity." description="바이브코딩과 로컬 AI 실험을 케이스 단위로 기록합니다. 유튜브에서 다루지 못한 구현 맥락과 설정값을 이곳에 정리합니다." />
@@ -41,27 +57,25 @@ const recentCases = cases.slice(0, 3);
       </div>
     </header>
     <aside class="hero-aside">
-      <p class="eyebrow">THIS WEEK</p>
-      <svg
-        class="hero-orbit"
-        viewBox="0 0 260 260"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <circle cx="130" cy="130" r="108" />
-        <circle cx="130" cy="130" r="70" />
-      </svg>
+      <p class="eyebrow">MOST VIEWED</p>
+      <div class="week-featured" id="most-viewed">
+        {thisWeekCases.length > 0 ? (
+          thisWeekCases.slice(0, 2).map((c) => (
+            <a href={`/case/${c.id}`} class="week-link" data-slug={c.id}>
+              <span class="card-tag text-accent">{c.data.tag}</span>
+              <h4>{c.data.title}</h4>
+            </a>
+          ))
+        ) : (
+          cases.slice(0, 2).map((c) => (
+            <a href={`/case/${c.id}`} class="week-link" data-slug={c.id}>
+              <span class="card-tag text-accent">{c.data.tag}</span>
+              <h4>{c.data.title}</h4>
+            </a>
+          ))
+        )}
+      </div>
     </aside>
-  </section>
-
-  <section class="topics topics-editorial" aria-label="주요 주제">
-    <p>핵심 주제</p>
-    <ul>
-      <li>Vibe Coding</li>
-      <li>Local AI Workflow</li>
-      <li>Local LLM Ops</li>
-      <li>YouTube Deep Dive Notes</li>
-    </ul>
   </section>
 
   <section class="featured" id="threads" aria-label="글타래">
@@ -98,9 +112,68 @@ const recentCases = cases.slice(0, 3);
 
 </main>
 
+<script is:inline>
+  (() => {
+    const key = 'savior_views';
+    const container = document.getElementById('most-viewed');
+    if (!container) return;
+    try {
+      const raw = localStorage.getItem(key) || '{}';
+      const views = JSON.parse(raw);
+      const links = Array.from(container.querySelectorAll('.week-link'));
+      links.sort((a, b) => {
+        const aSlug = a.getAttribute('data-slug') || '';
+        const bSlug = b.getAttribute('data-slug') || '';
+        return (views[bSlug] || 0) - (views[aSlug] || 0);
+      });
+      links.forEach((link) => container.appendChild(link));
+    } catch {}
+  })();
+</script>
+
 <Footer />
 
 <style>
+  .hero-aside {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: visible;
+  }
+
+  .hero-aside:has(.week-featured) {
+    overflow: visible;
+  }
+
+  .week-featured {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    z-index: 1;
+  }
+
+  .week-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: all 120ms ease;
+  }
+
+  .week-link:hover {
+    color: var(--accent);
+  }
+
+  .week-link h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+  }
+
   .featured {
     margin-top: 46px;
   }
