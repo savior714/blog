@@ -7,7 +7,7 @@ import { Picture } from 'astro:assets';
 export async function getStaticPaths() {
   const cases = await getCollection('cases');
   return cases.map((entry) => ({
-    params: { slug: entry.slug },
+    params: { slug: entry.id },
   }));
 }
 
@@ -15,9 +15,7 @@ const slug = Astro.params.slug;
 const entry = await getEntry('cases', slug);
 
 if (!entry) {
-  return {
-    state: 'notFound',
-  };
+  return Astro.redirect('/404');
 }
 
 const { tag, title, summary, publishedAt, youtubeUrl, thumbnail } = entry.data;
@@ -150,6 +148,7 @@ const articleSchema = {
   }
 
   .case-article {
+    width: 100%;
     padding-top: 12px;
   }
 
@@ -172,8 +171,9 @@ const articleSchema = {
     font-weight: 700;
     letter-spacing: -0.025em;
     line-height: 1.2;
+    max-width: 100%;
     margin: 0 0 16px;
-    max-width: 18ch;
+
   }
 
   .article-meta {
@@ -208,16 +208,6 @@ const articleSchema = {
     width: 100%;
     height: auto;
     display: block;
-  }
-
-  .article-content {
-    font-size: 1.02rem;
-    line-height: 1.82;
-    color: var(--foreground);
-  }
-
-  .article-content p {
-    margin: 0 0 18px;
   }
 
   @media (max-width: 720px) {

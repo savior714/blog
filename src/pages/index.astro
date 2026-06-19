@@ -1,6 +1,13 @@
 ---
 import Layout from '../components/Layout.astro';
 import Footer from '../components/Footer.astro';
+import { getCollection } from 'astro:content';
+
+const cases = (await getCollection('cases')).sort((a, b) =>
+  b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
+);
+
+const recentCases = cases.slice(0, 3);
 ---
 
 <Layout title="Savior Lab Notes | Build with AI, Ship with Clarity." description="바이브코딩과 로컬 AI 실험을 케이스 단위로 기록합니다. 유튜브에서 다루지 못한 구현 맥락과 설정값을 이곳에 정리합니다." />
@@ -20,7 +27,7 @@ import Footer from '../components/Footer.astro';
         못한 구현 맥락과 설정값을 이곳에 정리합니다.
       </p>
       <div class="hero-actions">
-        <a class="button primary" href="#">
+        <a class="button primary" href="#threads">
           대표 사례 보기
         </a>
         <a
@@ -57,7 +64,147 @@ import Footer from '../components/Footer.astro';
     </ul>
   </section>
 
+  <section class="featured" id="threads" aria-label="글타래">
+    <div class="section-head">
+      <h2>글타래</h2>
+      <a href="/case">전체 보기 →</a>
+    </div>
+
+    {recentCases.length > 0 ? (
+      <div class="cards">
+        {recentCases.map((c) => (
+          <a href={`/case/${c.slug}`} class="card">
+            <span class="card-tag text-accent">{c.data.tag}</span>
+            <h3>{c.data.title}</h3>
+            <p>{c.data.summary}</p>
+            <span class="card-date">{new Date(c.data.publishedAt).toLocaleDateString('ko-KR')}</span>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="cards">
+        <div class="card card-empty">
+          <p class="empty-text">아직 등록된 글타래가 없습니다.</p>
+        </div>
+        <div class="card card-empty">
+          <p class="empty-text">첫 번째 이야기를 작성해보세요.</p>
+        </div>
+        <div class="card card-empty">
+          <p class="empty-text">실행 결과를 공유할 자리를 준비 중입니다.</p>
+        </div>
+      </div>
+    )}
+  </section>
 
 </main>
 
 <Footer />
+
+<style>
+  .featured {
+    margin-top: 46px;
+  }
+
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .section-head h2 {
+    margin: 0;
+    font-size: 1.55rem;
+    letter-spacing: -0.01em;
+  }
+
+  .section-head a {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .cards {
+    margin-top: 14px;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+
+  .card {
+    background: color-mix(in srgb, #f9fbff 20%, var(--card));
+    border: 1px solid color-mix(in srgb, var(--line) 90%, transparent);
+    border-radius: 14px;
+    padding: 17px 17px 18px;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--line) 32%, transparent);
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 120ms ease;
+  }
+
+  .card:hover {
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+    transform: translateY(-1px);
+  }
+
+  .card-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+  }
+
+  .card p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .card-date {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .card-empty {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .card-empty:hover {
+    border-color: color-mix(in srgb, var(--line) 90%, transparent);
+    transform: none;
+  }
+
+  .empty-text {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 720px) {
+    .cards {
+      grid-template-columns: 1fr;
+    }
+
+    .section-head {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

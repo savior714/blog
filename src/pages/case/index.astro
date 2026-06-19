@@ -34,7 +34,7 @@ export function getStaticPaths() {
       ) : (
         <div class="cases-grid">
           {cases.map((c) => (
-            <a href={`/case/${c.slug}`} class="case-card bg-card">
+            <a href={`/case/${c.id}`} class="case-card bg-card">
               <span class="case-tag text-accent">{c.data.tag}</span>
               <h3>{c.data.title}</h3>
               <p>{c.data.summary}</p>

@@ -3,6 +3,17 @@ import type { APIRoute } from 'astro';
 export const prerender = false;
 
 const LM_STUDIO_URL = (process as any).env?.LM_STUDIO_URL || 'http://127.0.0.1:1234/v1';
+// Decode HTML entities to prevent double-escaping when LLM returns pre-escaped content
+function decodeHtmlEntities(html: string): string {
+  return html
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'");
+}
+
 
 export function generateFallbackSummary(title: string, content: string): { summary: string; svg: string } {
   // Clean markdown: remove code blocks, images, links, headers, horizontal rules
@@ -45,14 +56,14 @@ export function generateFallbackSummary(title: string, content: string): { summa
   }
 
   const allTitleWords = (title || 'Post').split(/\s+/);
-  const safeSummary = (summary || title || 'Untitled')
+  const safeSummary = decodeHtmlEntities(summary || title || 'Untitled')
     .slice(0, 50)
+    .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/&/g, '&amp;');
+    .replace(/>/g, '&gt;');
   
-  // Build title up to max 16 characters for readability
-  const maxTitleChars = 16;
+  // Build title up to max 20 characters for readability
+  const maxTitleChars = 20;
   let displayTitle = '';
   for (const word of allTitleWords) {
     const candidate = displayTitle ? displayTitle + ' ' + word : word;
@@ -62,7 +73,7 @@ export function generateFallbackSummary(title: string, content: string): { summa
       break;
     }
   }
-  displayTitle = displayTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;');
+  displayTitle = displayTitle.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   
   // Determine if title needs 2 lines (more than ~14 chars)
   const titleNeedTwoLines = displayTitle.length > 14;
@@ -218,6 +229,13 @@ Respond in JSON format only:
       console.log('LM Studio not available:', (lmStudioError as Error).message);
     }
 
+    // Initialize safeSummary for LLM success path (fallback block handles its own)
+    let safeSummary = decodeHtmlEntities(parsed?.summary || title || 'Untitled')
+      .slice(0, 50)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
     // Fallback if LM Studio failed or returned invalid JSON
     if (!parsed || !parsed.summary) {
       const text = (content || '')
@@ -243,10 +261,14 @@ Respond in JSON format only:
       }
 
       const allTitleWords = (title || 'Post').split(/\s+/);
-      const safeSummary = (summary || '').slice(0, 50).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;');
+      const safeSummary = decodeHtmlEntities(summary || title || 'Untitled')
+        .slice(0, 50)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
       
-      // Build title up to max 16 characters for readability
-      const maxTitleChars = 16;
+      // Build title up to max 20 characters for readability
+      const maxTitleChars = 20;
       let displayTitle = '';
       for (const word of allTitleWords) {
         const candidate = displayTitle ? displayTitle + ' ' + word : word;
@@ -256,7 +278,7 @@ Respond in JSON format only:
           break;
         }
       }
-      displayTitle = displayTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;');
+      displayTitle = displayTitle.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       
       // Determine if title needs 2 lines (more than ~14 chars)
       const titleNeedTwoLines = displayTitle.length > 14;
