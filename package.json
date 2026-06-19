@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@astrojs/vercel": "^9.0.5",
+    "@playwright/test": "^1.61.0",
     "@tailwindcss/postcss": "^4.3.1",
     "happy-dom": "^20.10.6",
     "tailwindcss": "^4.3.1",
