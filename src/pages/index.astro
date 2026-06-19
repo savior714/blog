@@ -1,6 +1,5 @@
 ---
 import Layout from '../components/Layout.astro';
-import Footer from '../components/Footer.astro';
 import { getCollection } from 'astro:content';
 
 const cases = (await getCollection('cases')).sort((a, b) =>
@@ -33,7 +32,6 @@ const thisWeekCases = cases.filter((c) => {
   <!-- 홈 페이지: Case, Editor만 표시 -->
   <nav class="hero-nav-inline">
     <a href="/case" class:active={currentPage === 'cases' || currentPage === 'home'}>Case</a>
-    <a href="/editor" class:active={currentPage === 'editor'}>Editor</a>
   </nav>
   <div class="hero-shell">
     <header class="hero-panel">
@@ -43,19 +41,7 @@ const thisWeekCases = cases.filter((c) => {
         바이브코딩과 로컬 AI 실험을 케이스 단위로 기록합니다. 유튜브에서 다루지
         못한 구현 맥락과 설정값을 이곳에 정리합니다.
       </p>
-      <div class="hero-actions">
-        <a class="button primary" href="#threads">
-          대표 사례 보기
-        </a>
-        <a
-          class="button ghost"
-          href="https://github.com/savior714/blog"
-          target="_blank"
-          rel="noreferrer"
-        >
-          GitHub
-        </a>
-      </div>
+
     </header>
     <aside class="hero-aside">
       <p class="eyebrow">MOST VIEWED</p>
@@ -131,8 +117,6 @@ const thisWeekCases = cases.filter((c) => {
     } catch {}
   })();
 </script>
-
-<Footer />
 
 <style>
   .hero-nav-inline {
