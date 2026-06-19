@@ -88,6 +88,18 @@ const articleSchema = {
   </div>
 </Layout>
 
+<script is:inline>
+  (() => {
+    const key = 'savior_views';
+    try {
+      const raw = localStorage.getItem(key) || '{}';
+      const views = JSON.parse(raw);
+      views['{{ slug }}'] = (views['{{ slug }}'] || 0) + 1;
+      localStorage.setItem(key, JSON.stringify(views));
+    } catch {}
+  })();
+</script>
+
 <style>
   .admin-page {
     max-width: 1080px;
