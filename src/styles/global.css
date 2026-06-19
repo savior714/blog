@@ -104,6 +104,7 @@ body {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(220px, 0.8fr);
   gap: 16px;
+  position: relative;
 }
 
 .hero-panel,

@@ -2,9 +2,10 @@
 interface Props {
   title: string;
   description?: string;
+  currentPage?: string;
 }
 
-const { title, description = 'Case notes on vibe coding and local AI workflows.' } = Astro.props;
+const { title, description = 'Case notes on vibe coding and local AI workflows.', currentPage = 'home' } = Astro.props;
 ---
 
 <html lang="ko">

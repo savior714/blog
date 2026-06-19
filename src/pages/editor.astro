@@ -1,19 +1,13 @@
 ---
 export const prerender = false;
 import Layout from '../components/Layout.astro';
+import Nav from '../components/Nav.astro';
 const isDev = import.meta.env.DEV || !import.meta.env.VERCEL_ENV;
 ---
 
-<Layout title="Editor | Savior Lab Notes">
+<Layout title="Editor | Savior Lab Notes" currentPage="editor">
   <div class="admin-page">
-    <nav class="admin-nav">
-      <a href="/" class="admin-nav-brand">Savior Lab Notes</a>
-      <div class="admin-nav-links">
-        <a href="/case">Cases</a>
-        <a href="/editor" class="active">Editor</a>
-      </div>
-    </nav>
-
+    <Nav currentPage="editor" position="top" />
     <form id="editor-form" class="admin-editor">
       <div class="editor-main">
         <div class="editor-fields">
@@ -260,48 +254,6 @@ const isDev = import.meta.env.DEV || !import.meta.env.VERCEL_ENV;
     width: 100%;
     margin: 0 auto;
     padding: 72px 48px 104px;
-  }
-
-  .admin-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 0;
-    border-bottom: 1px solid var(--line);
-    margin-bottom: 32px;
-  }
-
-  .admin-nav-brand {
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--foreground);
-    text-decoration: none;
-    letter-spacing: -0.01em;
-  }
-
-  .admin-nav-links {
-    display: flex;
-    gap: 16px;
-  }
-
-  .admin-nav-links a {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--muted);
-    text-decoration: none;
-    padding: 6px 12px;
-    border-radius: 8px;
-    transition: all 120ms ease;
-  }
-
-  .admin-nav-links a:hover {
-    color: var(--foreground);
-    background: color-mix(in srgb, var(--card) 60%, var(--background));
-  }
-
-  .admin-nav-links a.active {
-    color: var(--accent);
-    background: color-mix(in srgb, #edf2ff 50%, var(--card));
   }
 
   .admin-editor {
