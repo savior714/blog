@@ -17,15 +17,21 @@ verify_with:
 ## 2. Non-Negotiable Execution Rules
 ### MUST
 #### 2.1 Disk State First
+> **AGENTS.md §1.4 요약본 포함** — 메인 에이전트 컨텍스트 lazy-load. 상세·예시: 본 문서, [runtime_edit_tools.md](./runtime_edit_tools.md), [routing.md](./routing.md) §1.
+
 - 수정 전 반드시 `Read`로 exact snippet을 확보한다 — [runtime_edit_tools.md §1](./runtime_edit_tools.md).
 - truth는 디스크 상태뿐이다.
 - grep 결과나 기억만으로 부분 수정 금지.
 - 파일 I/O 실수 예시: [error_patterns.md §1](error_patterns.md#1-파일-편집-실수).
 - 편집 도구 실패·재시도·도구 선택: [runtime_edit_tools.md](./runtime_edit_tools.md) · Cursor 상세 [routing.md](./routing.md) §1.
 #### 2.2 Verification First
+> **AGENTS.md §1.5 요약본 포함** — 메인 에이전트 컨텍스트 lazy-load. 상세: 본 문서.
+
 - lint/type/test 실패 상태에서 완료 선언 금지.
 - severity 하향(`error → warn`) 또는 gate 우회 금지.
 #### 2.3 Plan First (강제 트리거)
+> **AGENTS.md §1.6 요약본 포함** — 메인 에이전트 컨텍스트 lazy-load. 상세·검증 스크립트: 본 문서.
+
 **트리거 키워드 감지**: "계획", "plan", "blueprint", "roadmap",
 "설계", "로드맵", "실행 계획", "구현 계획" 중 하나라도 발견 시:
 1. **반드시** [.agents/workflows/plan.md](../workflows/plan.md)를 **Read** (워크플로 SSOT — 별도 라우팅 API 없음)
@@ -37,10 +43,12 @@ verify_with:
 실패 시 수정 없이 제출 금지.
 자유형 계획 텍스트만 던지는 것으로 대체하지 않는다.
 #### 2.4 TDD Red-First
+> **AGENTS.md §1.7 요약본 포함** — 메인 에이전트 컨텍스트 lazy-load. 상세·예외: 본 문서.
+
 - 구현 전 실패 테스트를 작성하고 실행 로그를 확인한다.
 - `Red → Green → Refactor`를 강제한다.
 - 구현 후 테스트를 덧붙이는 방식 금지.
-- assertion 없는 테스트, Red 로그 없는 “TDD 완료” 선언 금지.
+- assertion 없는 테스트, Red 로그 없는 "TDD 완료" 선언 금지.
 - **예외 (UI/Styling)**: 비즈니스 로직이 없는 순수 View 렌더링, CSS 및 레이아웃 수정 등 디자인 변경 작업은 TDD Red-First 요건(실패 테스트 선 작성)에서 면제된다. (오버엔지니어링 방지 및 실용성 확보)
 #### 2.5 Roadmap Integrity
 - 미래 태스크(`todo`, `pending`)는 명시적 폐기 없이 삭제하지 않는다.
@@ -52,6 +60,8 @@ verify_with:
 - 라이선스 리스크(SSPL, BSL 등)가 있는 기술 도입은 원칙적으로 금지한다.
 - 불가피한 경우 `docs/knowledge/research/`에 분석 문서를 선행 작성하고 사용자의 최종 승인을 득한 후 진행한다.
 #### 2.8 Context Route Gate (편집 전 강제, IDE 공통)
+> **AGENTS.md §1.8 요약본 포함** — 메인 에이전트 컨텍스트 lazy-load. 상세·lazy Read: [routing.md](./routing.md) §2.
+
 저장소 파일을 **생성·수정·삭제**하기 전, 아래 순서를 반드시 지킨다.
 1. `just route <paths> --json --write-manifest`
 2. `must_read` 전량 Read
@@ -59,6 +69,8 @@ verify_with:
 4. `just route-gate-check <paths>`
 절차·lazy Read 상세: [routing.md](./routing.md) §2
 #### 2.9 Secrets & Credentials (ZERO-LEAK, 재발 금지)
+> **AGENTS.md §1.9 요약본 포함** — 메인 에이전트 컨텍스트 always-on. 상세: [PROJECT_RULES.md §4.1](../../PROJECT_RULES.md), [emr_security.md](../domains/medical/emr_security.md).
+
 상세: [PROJECT_RULES.md §4.1](../../PROJECT_RULES.md) · [emr_security.md](../domains/medical/emr_security.md)
 #### 2.10 Information Integrity & Honesty (Agentic Honesty)
 

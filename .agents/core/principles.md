@@ -10,6 +10,9 @@ verify_with: []
 # Core Operating Principles
 
 ## 1.1 Think Before Coding
+> **AGENTS.md §1.1 요약본 포함** — 메인 에이전트 컨텍스트 always-on. 상세/예외/WRONG-CORRECT 예시: 본 문서.
+
+> **Note**: AGENTS.md §1.1 에 요약된 핵심 규칙은 lazy-load 없이 매번 컨텍스트에 포함됩니다. 본 파일은 상세 설명·예외 케이스·WRONG/CORRECT 예시를 유지합니다.
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
 - 구현 전 가정은 명시한다.
 - 불확실하면 묻는다.
@@ -78,6 +81,7 @@ verify_with: []
 **시범**: [reporting.md](reporting.md) §1.6.1 · [AGENTS.md](../../AGENTS.md) Chat QA · [plan.md](../workflows/plan.md) §1.10.2 closeout.
 
 ## 1.2 Simplicity First
+> **AGENTS.md §1.2 요약본 포함** — 메인 에이전트 컨텍스트 always-on. 상세: 본 문서.
 **Minimum code that solves the problem. Nothing speculative.**
 - 요청받지 않은 기능은 추가하지 않는다.
 - 단일 용도 코드에 추상화 과잉 금지.
@@ -87,6 +91,7 @@ verify_with: []
 - 시니어 엔지니어가 과설계라고 판단할 수준이면 단순화한다.
 
 ## 1.3 Surgical Changes
+> **AGENTS.md §1.3 요약본 포함** — 메인 에이전트 컨텍스트 always-on. 상세·예외: 본 문서.
 **Touch only what you must. Clean up only your own mess.**
 - 기존 코드 수정 시, 인접 코드/주석/포맷을 함부로 손대지 않는다.
 - 깨진 부분만 고친다.

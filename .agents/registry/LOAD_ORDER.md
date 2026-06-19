@@ -10,21 +10,29 @@ domain: core
 
 ---
 
-## Phase 로딩 순서
+## T0 — Always Loaded (IDE 세션 시작 시 자동 포함)
+
+| 파일 | 설명 |
+|---|---|
+| `AGENTS.md` | 실행 헌법 — 우선순위·게이트·메타 금지 요약 |
+| `PROJECT_RULES.md` | 프로젝트 정책 — 스택·품질·보안 게이트 |
+
+**T0 = IDE always-applied, 세션 시작 SSOT**. 이 두 파일만 lazy-load 없이 매번 컨텍스트에 포함됩니다.
+
+---
+
+## Phase 로딩 순서 (lazy)
 
 | Phase | 시점 | 내용 |
-| :--- | :--- | :--- |
-| **1** | 세션 시작 | `PROJECT_RULES.md`, `AGENTS.md` |
-| **2** | **lazy** — 편집·`just route` 직전 | 본 문서, [CONTEXT_ROUTING.md](CONTEXT_ROUTING.md) |
-| **3** | **lazy** — plan·roadmap·discuss | `ROADMAP.md` · `just plan-preread` |
+|---|---|---|
+| **2** | 편집·`just route` 직전 | 본 문서, [CONTEXT_ROUTING.md](CONTEXT_ROUTING.md) |
+| **3** | plan·roadmap·discuss | `ROADMAP.md` · `just plan-preread` |
 | **4** | `--full` / 편집 직전 | CONTEXT_ROUTING 「Always Load T2」`core/*.md` |
 | **5** | 편집 대상 확정 | `just route <paths> --json` → domain · skills |
 | **6** | 슬래시·워크플로 | `.agents/workflows/<name>.md` ([WORKFLOW_AND_SKILL_INDEX.md](WORKFLOW_AND_SKILL_INDEX.md)) |
 | **7** | 종료·명시 트리거 | [reporting.md](../core/reporting.md) §1.0 |
 
-**세션 시작 SSOT**: `PROJECT_RULES.md` (`AGENTS.md`는 T0). Phase 2·`ROADMAP.md`는 lazy.
-
-**첫 응답**: 위 세션 시작 SSOT. 코드·문서 편집 착수 전 Phase 2 Read.
+**첫 응답**: T0 파일 (`AGENTS.md`, `PROJECT_RULES.md`). 코드·문서 편집 착수 전 Phase 2 Read.
 
 **멀티 에이전트**: `ROUTE_MANIFEST_PATH` · `ROUTE_SESSION_KEY`. **필수 파일 부재**: 사용자 보고 — 거버넌스 placeholder 생성 금지.
 
@@ -48,4 +56,4 @@ domain: core
 
 ---
 
-**Last Updated**: 2026-06-12 · Bootstrap kernel subset
+**Last Updated**: 2026-06-19 · Bootstrap kernel subset

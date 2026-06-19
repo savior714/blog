@@ -11,12 +11,13 @@ domain: core
 ## 컨텍스트 Tier
 
 | Tier | 시점 | 내용 |
-| :--- | :--- | :--- |
+|---|---|---|
 | **T0** | IDE always-applied | `AGENTS.md` + `core/principles.md` + `core/error_patterns.md` + `core/orchestration.md` 헤더 |
 | **T1** | 세션 시작 | `PROJECT_RULES.md` |
-| **T1†** | lazy | `LOAD_ORDER`, 본 문서, (선택) `docs/plans/ROADMAP.md` |
 | **T2** | `just route` / 편집 직전 | Always Load + domain rules |
 | **T3** | lazy | `error_patterns/detail/*.md` 등 on-demand |
+
+**T0 + T1 = 세션 시작 SSOT** (`AGENTS.md`, `PROJECT_RULES.md`). T2·T3 = lazy-load.
 
 **금지**: `patterns.yaml` always_apply · 존재하지 않는 도메인 파일을 Path 표에 넣지 않음.
 
@@ -34,7 +35,7 @@ domain: core
 ## 경로별 동적 매핑 (커널 포함분)
 
 | 파일 경로 패턴 (Glob) | 적용 규칙 | 용도 |
-| :--- | :--- | :--- |
+|---|---|---|
 | `tests/e2e/**/*`, `**/*.spec.ts` | [testing/playwright.md](../domains/testing/playwright.md) | Playwright E2E |
 
 **프로젝트별 확장**: `{{FRONTEND_APP_PATH}}/**/*.{ts,tsx}` 등은 프로젝트가 `.agents/domains/` 규칙을 추가한 뒤 본 표에 행을 넣으세요. EMR 예시(full glob·`PROJECT_SKILL_ROUTING.json`)는 EMR `.agents/registry/CONTEXT_ROUTING.md`를 참고합니다.
@@ -53,4 +54,4 @@ domain: core
 
 **세션 lazy**: [LOAD_ORDER.md](LOAD_ORDER.md) Phase 2 — 본 문서 Glob·Tier는 **편집·route 직전** Read.
 
-**Last Updated**: 2026-06-12 · Bootstrap kernel subset
+**Last Updated**: 2026-06-19 · Bootstrap kernel subset

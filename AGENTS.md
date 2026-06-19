@@ -1,6 +1,6 @@
 # AGENTS.md — Unified Execution Constitution (Bootstrap Kernel)
 
-에이전트 **헌법 요약**입니다. 우선순위·게이트·레지스트리 진입점만 둡니다. 표·긴 스킬 목록은 레지스트리 파일로 위임합니다.
+에이전트 **헌법 요약**입니다. 우선순위·게이트·메타 금지만 둡니다. 상세 lazy-load: `.agents/core/`, `.agents/registry/`, `.agents/workflows/`.
 
 ---
 
@@ -18,91 +18,108 @@
 
 ---
 
-## 1. Core Operating Principles
+## 1. Core Operating Principles (always-on)
 
-normative SSOT: [.agents/core/principles.md](.agents/core/principles.md)
+### 1.1 Think Before Coding
+- 구현 전 가정은 명시한다. 불확실하면 묻는다.
+- **Information Integrity**: 실측하지 않은 정보 단정 금지. "아마 ~일 것"으로 완료 선언 금지.
+- **Quick Pick**: 모호할 때 `AskQuestion`/`question` 도구로 구조화 선택. 옵션마다 기대 결과 한 줄 + (권장) 태그.
 
-- **Policy**: [PROJECT_RULES.md §3](PROJECT_RULES.md)
-- **Think Before Coding · Quick Pick**: [principles.md §1.1](.agents/core/principles.md#11-think-before-coding)
-- **Simplicity · Surgical · Goal-Driven**: [principles.md §1.2–§1.4](.agents/core/principles.md#12-simplicity-first)
-- **Bug Fixes**: [/diagnose](.agents/workflows/diagnose.md) · [/investigate](.agents/workflows/investigate.md)
-- **Merge & Review**: [/review](.agents/skills/review/SKILL.md)
-- **Execution Rules**: [execution.md §2](.agents/core/execution.md)
-- **Subagent Orchestration (O2 Strengthened)**: [orchestration.md](.agents/core/orchestration.md) — 구현·편집·탐색은 Task 위임; **연속 작업 2+ → subagent 필수**; **chunk**(파일 1·함수 1) 순차 · 턴당 spawn 1개; 메인=지휘·합성만
-- **Commit Gate Failure**: [error_patterns.md §10](.agents/core/error_patterns.md#10-커밋-게이트-실패시--no-verify-금지) — `--no-verify` 우회 절대 금지, 반드시 오류 수정 후 재시도
-- **Edit Tool Schema**: [routing.md §1.1](.agents/core/routing.md#11-file-edit-tool-schema-편집-도구-ssot) (Cursor) · [runtime_edit_tools.md](.agents/core/runtime_edit_tools.md)
-- **Workaround Accountability**: [principles.md §1.6](.agents/core/principles.md#16-workaround-accountability--close-turn-reflection)
-- **Code Quality Lifecycle** (설계→구현→리뷰→테스트): [code_quality_lifecycle.md](.agents/core/code_quality_lifecycle.md)
+### 1.2 Simplicity First
+- 요청받지 않은 기능 추가 금지. 단일 용도 코드에 추상화 과잉 금지.
+- 200 줄이면 50 줄로 가능하지 않은지 검토. 시니어 엔지니어가 과설계라고 판단하면 단순화.
+
+### 1.3 Surgical Changes
+- 기존 코드 수정 시 인접 코드/주석/포맷 함부로 손대지 않음. 깨진 부분만 고침.
+- 관련 없는 dead code 는 삭제하지 말고 언급만 함.
+
+### 1.4 Secrets ZERO-LEAK
+- API 키·액세스 토큰·비밀번호·`.env` 등 비밀값 원문 노출 절대 금지.
+- 비밀값 필요 시 사용자에게 안전한 제공 경로 먼저 묻는다.
+
+### 1.5 O2 Orchestration
+- 메인 에이전트는 **지휘·의사결정·합성**만 담당. 탐색·구현·검증은 Task subagent 에 위임.
+- **연속 작업 2+** (서로 다른 종류 작업 단계 2 개 이상 연속) → **Task subagent 필수**. 메인 연속 직접 수행 금지.
+- **Chunk 단위**: 1 Task = 파일 1 + 함수·컴포넌트 1 변경. 턴당 spawn 1 개·순차 handoff.
+
+### 1.6 Turn 0 Triage
+메인은 구현·편집·테스트·코드베이스 탐색 전 아래만 수행:
+1. 요청 유형: 질문만 / 단일 수정 / 복합·플랜 / 디버그 / 리뷰
+2. 범위: 예상 터치 파일 수·레이어 수
+3. 게이트: Blueprint 필요, `just route` 필요, HITL 필요 여부
+
+**이관 트리거** (하나라도 해당 → 즉시 서브에이전트 Task):
+- 연속 작업 2+
+- 파일 편집·구현 요청 (파일 1 개·함수 1 개 포함)
+- 수정·조사 대상 파일 2 개 이상, 또는 레이어 2 개 이상
+- `plan` / `blueprint` / `/discover` / PLAN 순차 실행
+- 원인 불명 버그·회귀 (`/diagnose` · `/investigate`)
+
+### 1.7 Handoff 계약
+서브에이전트 `prompt` 에는 아래 블록 필수 포함:
+
+```markdown
+## Mission
+<한 문장 목표>
+
+## Success criteria
+- verify: `<단일 명령>`
+
+## Bounded scope
+- Allowed paths: ...
+- Out of scope: ...
+
+## Gates (subagent MUST)
+1. `just route <paths> --json --write-manifest`
+2. `must_read` 전량 Read
+3. `just route-read` → `just route-gate-check`
+4. verify 실행 후 결과 보고
+5. **원자 편집** — 기존 파일 `Write` 금지 · 1 회 부분 수정 = 함수·컴포넌트 1 개
+```
+
+### 1.8 메타 금지 11
+1. **디스크 SSOT** — 수정·판단 전 디스크 최신본 읽기
+2. **단일 매칭** — 부분 수정 전 대상 문자열이 파일에 정확히 1 번인지 확인
+3. **실패 후 동일 입력 금지** — 부분 수정 도구 실패 후 같은 old/target 재시도 금지
+4. **2 회 실패 → 전략 전환** — 같은 파일·같은 작업에서 편집이 2 회 연속 실패하면 부분 수정 멈춤
+5. **게이트 PASS 전 다음 단계 금지** — plan-lint·route-gate·해당 Verify PASS 전에 구현·Task 완료 처리 금지
+6. **종료는 선택 필수** — discuss/plan 등 종료·핸드오프는 사용자 선택 없이 마무리하지 않음
+7. **격리·완전성** — 테스트·mock·공유 저장소는 사용처가 기대하는 export·초기값·cleanup 맞춤
+8. **patterns ID 정렬** — `patterns.yaml` SSOT 는 ID 숫자 순 유지
+9. **동일 입력 무한 재시도 금지** — old 와 new 가 같으면 부분 수정 도구 호출 금지
+10. **커밋 게이트 실패 시 `--no-verify` 금지** — 린트/타입 오류 수정 후 재시도
+11. **부분 수정 후 검증 누락** — 성공 응답 후 반드시 grep/read 로 실제 변경 검증
 
 ---
 
 ## 2. Execution Gates (pointer)
 
-**O2 선행 (구현·편집·탐색)**: 아래 §2·§3·§4 게이트는 **실행 subagent**가 따른다. 메인은 [orchestration.md](.agents/core/orchestration.md) O2 Strengthened — triage·Task spawn·handoff 합성만; 구현·편집·코드베이스 탐색은 **항상 Task 위임**; **연속 작업 2+ → subagent 필수**(메인 연속 직접 수행 금지); **chunk**(파일 1·함수 1) 단위·**턴당 spawn 1개** ([orchestration.md §2 Chunk](.agents/core/orchestration.md#chunk--turn-budget)). 질문·설명·[§5 O0](.agents/core/orchestration.md#5-직접-실행-예외-o0) 예외만 메인 직접.
-
-**메타 금지 11** normative SSOT: [error_patterns.md#메타-금지-11](.agents/core/error_patterns.md#메타-금지-11) (`always_apply`).
+상세: `.agents/core/execution.md`, `.agents/core/routing.md`, `.agents/core/orchestration.md`.
 
 ### 2.1 Editing / Routing
-
-**실행 subagent MUST** — 규범 SSOT: [routing.md](.agents/core/routing.md) §1 · §2 · [orchestration.md §4 Gates](.agents/core/orchestration.md#4-handoff-계약-task-prompt-필수). WRONG/CORRECT: [error_patterns §1](.agents/core/error_patterns.md#1-파일-편집-실수) lazy-load. 요약: Read 최신본 → old 1회 일치 → old≠new → 원자 편집(함수·컴포넌트 1개) · 기존 파일 Write 금지 — [routing.md §1.5](.agents/core/routing.md#15-atomic-edit-granularity-원자-편집-단위). 도구 키: [runtime_edit_tools.md §1](.agents/core/runtime_edit_tools.md).
+`just route <paths> --json --write-manifest` → `must_read` Read → `just route-read` → `just route-gate-check`.
 
 ### 2.2 Plan / Blueprint
+- **Plan First**: 복합 작업은 `just plan-lint` PASS 전 구현 착수 금지.
+- **Task closeout**: Blueprint Task `Status`/`Conclusion` 은 **`just plan-task-close` CLI 만** — 에디터 직접 수정 절대 금지.
+- **DoD 재귀 금지**: DoD 섹션에 `just plan-close` 를 verify 명령어로 포함하지 않음.
+- **Archive**: `docs/plans/` 파일 이동 시 `.agents/workflows/archive.md` 먼저 Read → `scripts/archive_plans.py` 실행 — 수동 복사/삭제 절대 금지.
 
-- **Plan First**: 복합 작업은 `just plan-lint` PASS 전 구현 착수 금지 — [PROJECT_RULES.md §3](PROJECT_RULES.md) · [planning.md](.agents/core/planning.md).
-- **Task closeout**: Blueprint Task `Status`/`Conclusion`은 **`just plan-task-close` CLI만** — 에디터 직접 수정 **절대 금지** — [plan.md §1.10](.agents/workflows/plan.md) · [error_patterns/detail/blueprint.md §5.6](.agents/core/error_patterns/detail/blueprint.md#56-task-statusconclusion-에디터-직접-수정).
-- **DoD 재귀 금지**: DoD 섹션에 `just plan-close`를 verify 명령어로 포함하지 않음 — `plan_close_gate.py`가 이를 추출해 자기 자신을 호출하는 재귀 타임아웃을 유발함 — [error_patterns/detail/blueprint.md §5.7](.agents/core/error_patterns/detail/blueprint.md#57-dod에-just-plan-close-폰리만-폰리마이스통).
-- **Archive**: `docs/plans/` 파일 이동 시 **반드시** [`.agents/workflows/archive.md`](.agents/workflows/archive.md) 먼저 Read → `scripts/archive_plans.py` 실행 — 수동 복사/삭제 **절대 금지** — [archive.md §실행 절차](.agents/workflows/archive.md).
-- 상세: [planning.md](.agents/core/planning.md) · [workflows/plan.md](.agents/workflows/plan.md) · [archive.md](.agents/workflows/archive.md).
+### 2.3 Dynamic Rules & Loading
+세션 시작: `PROJECT_RULES.md`. lazy (편집·route 직전): `.agents/registry/LOAD_ORDER.md`, `.agents/registry/CONTEXT_ROUTING.md`.
 
----
-
-## 3. Dynamic Rules & Loading
-
-**세션 시작**: `PROJECT_RULES.md`만. **lazy** (편집·route 직전): [LOAD_ORDER.md](.agents/registry/LOAD_ORDER.md) Phase 2 · [CONTEXT_ROUTING.md](.agents/registry/CONTEXT_ROUTING.md) · `ROADMAP.md` (plan·roadmap·discuss 시).
-
-**실행 subagent** 편집 직전: `just route <paths> --json --write-manifest` → `must_read` Read → `just route-read` → `just route-gate-check`.
+### 2.4 Verification
+검증 수준·게이트: `.agents/core/verification.md`. 저장소 수정 있었을 때 세션 종료 검증은 `just lint-turn-end`.
 
 ---
 
-## 4. Verification
-
-검증 수준·게이트: [verification.md](.agents/core/verification.md) — 저장소 수정 있었을 때 세션 종료 검증은 `shell` Task로 `just lint-turn-end` 위임 권장 ([orchestration.md §5](.agents/core/orchestration.md#5-메인-에이전트-역할-경계)). 시점별 품질 체크: [code_quality_lifecycle.md](.agents/core/code_quality_lifecycle.md).
-
-### 4.1 Partial Edit Tool — 한글 콘텐츠 제한 (Cursor)
-
-**실행 subagent** — 규범 SSOT: [runtime_edit_tools.md](.agents/core/runtime_edit_tools.md) §1 · §4. 요약: 부분 수정 도구는 ASCII-only JSON에 최적화(한글 본문 직삽입 시 파싱 실패 가능) · 영문/코드 → 런타임 부분 수정 도구 · 한글·특수문자 대량 → 터미널 우회(§4) · `sed -i ''`(macOS)+한글 금지.
-
-### 4.2 Test — 메시지 전역 고유성
-
-테스트 assertion 문자열은 페이지·출력 내 **단일 요소**만 매칭되도록 고유 식별자를 포함한다. 중복 라벨과 message가 겹치지 않게 하고, 필요 시 `data-testid`를 사용한다.
-
-### 4.3 Plan — closeout 실행 순서 (커널)
-
-`just plan-close`는 프로젝트 DoD에 명시된 검증 레시피를 순서대로 실행한다. **기본 커널**은 Linear 연동 없이 `plan-lint-ci` + `plan-close`만으로 충분하다.
-
-```bash
-just plan-lint-ci plan=docs/plans/<file>.md   # 1. Blueprint lint (Linear 생략)
-just plan-close plan=docs/plans/<file>.md     # 2. plan close gate
-```
-
-프로젝트가 Linear를 쓰면 `Justfile`에 `linear-sync` 레시피를 추가하고 closeout 순서를 확장한다.
-
-### 4.4 Plan — Conclusion 플레이스홀더 금지
-
-`just plan-lint`는 각 Task의 `Conclusion` 필드를 검증한다. Conclusion은 최소 **25자 이상**, 실제 검증 결과(파일명·테스트 수·명령어 결과)를 포함한다. `[완료 시 기입]` 등 플레이스홀더는 금지.
-
-### 4.5 Justfile — DoD 레시피 실존 검증
-
-PLAN DoD의 `just <recipe>`는 실제 justfile에 존재해야 한다. PLAN 작성 시 `just --list`로 레시피 실존을 확인한다.
-
----
-
-## 5. Reference Index
+## 3. Reference Index
 
 - **Policy / Core**: `PROJECT_RULES.md`, `.agents/core/`
-- **Registry**: `.agents/registry/RULE_INDEX.md`
+- **Registry**: `.agents/registry/RULE_INDEX.md`, `LOAD_ORDER.md`, `CONTEXT_ROUTING.md`
+- **Workflows**: `.agents/workflows/`
 - **Specs**: `docs/specs/` (프로젝트가 추가한 경우)
 
-에이전트 규칙 SSOT는 `PROJECT_RULES.md`, `.agents/core/` 및 `AGENTS.md`입니다.
+에이전트 규칙 SSOT 는 `PROJECT_RULES.md`, `.agents/core/` 및 `AGENTS.md` 입니다.
 
-중복 방지: `.cursor/rules/` 미사용. **`.cursor/commands/*.md`는 workflow pointer만** (본문 SSOT: `.agents/workflows/`). 슬래시·키워드 카탈로그: [WORKFLOW_AND_SKILL_INDEX.md](.agents/registry/WORKFLOW_AND_SKILL_INDEX.md).
+중복 방지: `.cursor/rules/` 미사용. **`.cursor/commands/*.md` 는 workflow pointer 만** (본문 SSOT: `.agents/workflows/`). 슬래시·키워드 카탈로그: [WORKFLOW_AND_SKILL_INDEX.md](.agents/registry/WORKFLOW_AND_SKILL_INDEX.md).

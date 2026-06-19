@@ -17,6 +17,8 @@ verify_with:
 
 ## 1. File Edit Tool Schema & Editing Rules
 
+> **AGENTS.md §1.10, §1.11 요약본 포함** — 메인 에이전트 컨텍스트 lazy-load. 상세·WRONG/CORRECT 예시: 본 문서, [runtime_edit_tools.md](./runtime_edit_tools.md), [error_patterns/detail/editing.md](error_patterns/detail/editing.md).
+
 > **Cursor IDE SSOT**: 본 절 §1.1–§1.4의 도구 이름·키 스키마는 **Cursor** 기준이다. 보조 도구·MCP `repo_*`·한글 우회: [runtime_edit_tools.md](./runtime_edit_tools.md).
 
 저장소, 코드베이스, 파일시스템, 개발, 디버깅 관련 작업 시 다음 원칙을 반드시 준수한다.
@@ -174,7 +176,6 @@ Applies to all tool calls, not just file edits.
 **예시:**
 
 ```
-ToolFoo(action='patch', id='x') → Not found
 ToolFoo(action='patch', id='x') → Not found
 
 => retry prohibited

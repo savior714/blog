@@ -10,6 +10,8 @@ verify_with:
 <!-- Language: ko -->
 # Subagent Orchestration (Main = Conductor)
 
+> **AGENTS.md §1.12-§1.14 요약본 포함** — 메인 에이전트 컨텍스트 always-on. 상세·예외·WRONG/CORRECT 예시: 본 문서, [error_patterns/detail/](error_patterns/detail/).
+
 메인 에이전트는 **지휘·의사결정·합성**만 담당하고, **탐색·구현·검증**은 서브에이전트(Cursor **Task** 도구)에 위임하는 규범 SSOT.
 
 **기본 모드**: **O2 Strengthened** — **구현·편집 요청은 항상** 서브에이전트에 위임한다. **연속 작업 2+**(서로 다른 종류의 작업 단계가 2개 이상 연속 필요)도 **반드시 Task subagent** — 메인 연속 직접 수행 **금지**. 메인은 triage, AskQuestion, Task spawn, 합성만 수행한다. **코드베이스 탐색**(`Grep`/`SemanticSearch`/`Glob`/다파일 `Read`)도 **`explore` Task**에 위임한다. 복합 작업은 **chunk**(파일 1·함수 1) 단위로 순차 Task spawn — [§2 Chunk · Turn budget](#chunk--turn-budget).
