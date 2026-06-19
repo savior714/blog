@@ -1,0 +1,69 @@
+---
+interface Props {
+  currentPage?: string;
+  position?: 'top' | 'hero-aside';
+}
+
+const { currentPage = 'home', position = 'top' } = Astro.props;
+---
+
+{position === 'hero-aside' ? (
+  <div class="hero-nav">
+    <!-- hero-aside: 홈 페이지에서만 사용, Case 링크 -->
+    <a href="/case" class:active={currentPage === 'cases' || currentPage === 'home'}>Case</a>
+  </div>
+) : (
+  <nav class="top-nav">
+    <!-- top-nav: 메인 페이지는 하위 페이지 링크, 서브 페이지는 메인 링크만 -->
+    {currentPage === 'home' ? (
+      <>
+        <a href="/case" class:active={currentPage === 'cases' || currentPage === 'home'}>Case</a>
+        <a href="/editor" class:active={currentPage === 'editor'}>Editor</a>
+      </>
+    ) : (
+      <a href="/">Main</a>
+    )}
+  </nav>
+)}
+
+<style>
+  .top-nav,
+  .hero-nav {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .hero-nav {
+    justify-content: flex-end;
+    margin-bottom: 0;
+  }
+
+  .top-nav a,
+  .hero-nav a {
+    color: var(--foreground);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 120ms ease;
+  }
+
+  .hero-nav a {
+    font-size: 13px;
+    padding: 4px 10px;
+  }
+
+  .top-nav a:hover,
+  .hero-nav a:hover {
+    color: var(--accent);
+  }
+
+  .top-nav a.active,
+  .hero-nav a.active {
+    color: var(--accent);
+    background: color-mix(in srgb, #edf2ff 50%, var(--card));
+  }
+</style>

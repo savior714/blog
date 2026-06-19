@@ -8,6 +8,7 @@ const cases = (await getCollection('cases')).sort((a, b) =>
 );
 
 const recentCases = cases.slice(0, 3);
+const currentPage = 'home';
 
 // This Week: articles published this week (Monday-based)
 const now = new Date();
@@ -26,15 +27,15 @@ const thisWeekCases = cases.filter((c) => {
 });
 ---
 
-<Layout title="Savior Lab Notes | Build with AI, Ship with Clarity." description="바이브코딩과 로컬 AI 실험을 케이스 단위로 기록합니다. 유튜브에서 다루지 못한 구현 맥락과 설정값을 이곳에 정리합니다." />
-
-<nav class="top-nav" style="max-width:1080px;margin:0 auto;padding:28px 24px 8px;">
-  <a href="/case">Cases</a>
-  <a href="/editor">Editor</a>
-</nav>
+<Layout title="Savior Lab Notes | Build with AI, Ship with Clarity." description="바이브코딩과 로컬 AI 실험을 케이스 단위로 기록합니다. 유튜브에서 다루지 못한 구현 맥락과 설정값을 이곳에 정리합니다." currentPage="home">
 
 <main class="page magazine-page">
-  <section class="hero-shell">
+  <!-- 홈 페이지: Case, Editor만 표시 -->
+  <nav class="hero-nav-inline">
+    <a href="/case" class:active={currentPage === 'cases' || currentPage === 'home'}>Case</a>
+    <a href="/editor" class:active={currentPage === 'editor'}>Editor</a>
+  </nav>
+  <div class="hero-shell">
     <header class="hero-panel">
       <p class="eyebrow">SAVIOR LAB NOTES</p>
       <h1>Build with AI, Ship with Clarity.</h1>
@@ -76,7 +77,7 @@ const thisWeekCases = cases.filter((c) => {
         )}
       </div>
     </aside>
-  </section>
+  </div>
 
   <section class="featured" id="threads" aria-label="글타래">
     <div class="section-head">
@@ -134,6 +135,32 @@ const thisWeekCases = cases.filter((c) => {
 <Footer />
 
 <style>
+  .hero-nav-inline {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .hero-nav-inline a {
+    color: var(--foreground);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 120ms ease;
+  }
+
+  .hero-nav-inline a:hover {
+    color: var(--accent);
+  }
+
+  .hero-nav-inline a.active {
+    color: var(--accent);
+    background: color-mix(in srgb, #edf2ff 50%, var(--card));
+  }
+
   .hero-aside {
     display: flex;
     flex-direction: column;
