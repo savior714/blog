@@ -18,6 +18,46 @@ lint-turn-end:
     @echo "Turn-end gate (bootstrap kernel — extend per project)"
     @just verify
 
+# --- Commit gates (adapted from EMR) ---
+
+# hard gate — 보안 관련 검사
+commit-gate-hard:
+    @echo "🛡️ Hard gate (security)..."
+    @uv run python scripts/verify/staged_secret_gate.py
+
+# soft gate — lint + TypeScript strict
+commit-gate-soft:
+    @echo "🔒 Soft gate (lint + typecheck)..."
+    @npx eslint --fix src/ 2>/dev/null || true
+    @echo "🔒 TypeScript strict gate (zero tolerance)..."
+    @bash -c '\
+        TY_ERRORS=$(npx tsc --noEmit 2>&1); \
+        MY_FILES=$(git diff --name-only HEAD | grep -E "\\.ts$" || true); \
+        if [ -z "$$MY_FILES" ]; then \
+            echo "No TypeScript files changed — skipping strict check."; \
+        else \
+            echo "$$TY_ERRORS" | grep -E "error TS" | while read -r line; do \
+                FILE=$(echo "$$line" | grep -oP "^[^:]+") || true; \
+                if echo "$$MY_FILES" | grep -q "$$FILE"; then \
+                    echo "MY CHANGE: $$line"; \
+                    exit 1; \
+                else \
+                    echo "PRE-EXISTING: $$line"; \
+                fi; \
+            done; \
+        fi'
+
+# commit gate — hard → soft 순차 실행
+commit-gate:
+    @echo "🔒 Commit gate (hard → soft)..."
+    just commit-gate-hard
+    just commit-gate-soft
+
+# renderer ship gate — Vercel build SSOT
+renderer-ship-gate:
+    @echo "🚀 Renderer ship gate (Vercel build)..."
+    npm run build
+
 # --- Plan loop (kernel) ---
 plan-preread plan="" *args="":
     @if [ -z "{{plan}}" ]; then echo "Usage: just plan-preread docs/plans/<file>.md --write"; exit 1; fi
