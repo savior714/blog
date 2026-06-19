@@ -28,7 +28,7 @@ const thisWeekCases = cases.filter((c) => {
 
 <Layout title="Savior Lab Notes | Build with AI, Ship with Clarity." description="바이브코딩과 로컬 AI 실험을 케이스 단위로 기록합니다. 유튜브에서 다루지 못한 구현 맥락과 설정값을 이곳에 정리합니다." />
 
-<nav class="top-nav" style="max-width:1080px;margin:0 auto;padding:16px 24px 0;">
+<nav class="top-nav" style="max-width:1080px;margin:0 auto;padding:28px 24px 8px;">
   <a href="/case">Cases</a>
   <a href="/editor">Editor</a>
 </nav>
@@ -137,10 +137,15 @@ const thisWeekCases = cases.filter((c) => {
   .hero-aside {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: flex-start;
     position: relative;
     overflow: visible;
+  }
+
+  .hero-aside > .eyebrow {
+    text-align: right;
+    width: 100%;
   }
 
   .hero-aside:has(.week-featured) {
@@ -150,32 +155,41 @@ const thisWeekCases = cases.filter((c) => {
   .week-featured {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
     width: 100%;
     z-index: 1;
+    margin-top: 14px;
   }
 
   .week-link {
     text-decoration: none;
     color: inherit;
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
     transition: all 120ms ease;
   }
 
   .week-link:hover {
-    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 6%, var(--card));
   }
 
   .week-link h4 {
     margin: 0;
-    font-size: 0.95rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    line-height: 1.35;
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .week-link .card-tag {
+    font-size: 10px;
+    flex-shrink: 0;
   }
 
   .featured {
-    margin-top: 46px;
+    margin-top: 20px;
   }
 
   .section-head {
