@@ -1,6 +1,7 @@
 ---
 export const prerender = false;
 import Layout from '../components/Layout.astro';
+const isDev = import.meta.env.DEV || !import.meta.env.VERCEL_ENV;
 ---
 
 <Layout title="Editor | Savior Lab Notes">
@@ -74,9 +75,10 @@ import Layout from '../components/Layout.astro';
   </div>
 </Layout>
 
-<script is:inline>
+<script>
+  const isDev = import.meta.env.DEV;
   // Production guard: hide editor on Vercel unless EDITOR_SECRET is set
-  if (import.meta.env.VERCEL_ENV === 'production' && !import.meta.env.Editor_Secret) {
+  if (!isDev && !import.meta.env.Editor_Secret) {
     window.location.replace('/');
   }
 
@@ -164,11 +166,11 @@ import Layout from '../components/Layout.astro';
         .filter(Boolean)
         .map((p) => {
           let line = escapeHtml(p);
-          line = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-          line = line.replace(/(?<=^| )\*(.+?)\*(?= |$)/g, '<em>$1</em>');
           line = line.replace(/^### (.+)$/gm, '<h3 style="font-size:1.05rem;font-weight:600;margin:16px 0 8px;">$1</h3>');
           line = line.replace(/^## (.+)$/gm, '<h2 style="font-size:1.25rem;font-weight:700;letter-spacing:-0.01em;margin:20px 0 10px;">$1</h2>');
           line = line.replace(/^# (.+)$/gm, '<h1 style="font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 12px;">$1</h1>');
+          line = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+          line = line.replace(/(?<=^| )\*(.+?)\*(?= |$)/g, '<em>$1</em>');
           line = line.replace(/^- (.+)$/gm, '<li>$1</li>');
           if (line.startsWith('<li>')) line = `<ul>${line}</ul>`;
           if (!line.startsWith('<h') && !line.startsWith('<ul') && !line.startsWith('<li')) {
