@@ -73,7 +73,7 @@ const recentCases = cases.slice(0, 3);
     {recentCases.length > 0 ? (
       <div class="cards">
         {recentCases.map((c) => (
-          <a href={`/case/${c.slug}`} class="card">
+          <a href={`/case/${c.id}`} class="card">
             <span class="card-tag text-accent">{c.data.tag}</span>
             <h3>{c.data.title}</h3>
             <p>{c.data.summary}</p>
