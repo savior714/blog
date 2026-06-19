@@ -70,10 +70,10 @@ TUI가 시작되면 로컬 LM Studio에 연결되어 모델이 로드됩니다. 
 | 모델 | 최소 RAM | 용도 |
 |------|----------|------|
 | Qwen3.6-27B | 32GB | 일반적인 코드 작성, 버그 수정 |
-| Qwen3.6-35B-A3B | 24GB+ | 복잡한 리팩토링 (MoE, 효율적) |
-| Llama 4 Scout 17B-16E | 24GB | 코드 생성 특화 |
+| Qwen3.6-35B-A3B | 32GB | 복잡한 리팩토링 (MoE, 효율적) |
+| Gemma 4 12B | 16GB | 경량 코드 작성, 빠른 응답 |
 
-> Apple Silicon Mac(M2/M3/M4)은 Unified Memory 덕분에 35B-A3B 모델도 충분히 돌릴 수 있습니다.
+> Apple Silicon Mac(M4/M5)은 Unified Memory 덕분에 35B-A3B 모델도 충분히 돌릴 수 있습니다.
 
 ## 자주 묻는 질문
 

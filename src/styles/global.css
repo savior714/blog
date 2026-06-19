@@ -692,8 +692,19 @@ body {
   border-radius: 0 10px 10px 0;
   color: var(--foreground);
   font-style: italic;
-  display: flex;
-  align-items: center;
+}
+
+.article-content blockquote p {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.article-content blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.article-content blockquote pre {
+  margin: 0 0 12px;
 }
 
 .article-content blockquote p {
